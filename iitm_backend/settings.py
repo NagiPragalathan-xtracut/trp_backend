@@ -43,9 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'base',
     'ckeditor',
     'storages',
+    'base.apps.BaseConfig',
 ]
 
 MIDDLEWARE = [
@@ -149,7 +149,7 @@ AWS_S3_VERIFY = True
 
 # Use S3 for static and media files
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
+# STATICFILES_STORAGE = 'storages.backends.s3boto3.S3StaticStorage'
 
 # CKEditor Configuration
 CKEDITOR_CONFIGS = {

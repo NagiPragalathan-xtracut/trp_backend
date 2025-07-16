@@ -1,0 +1,382 @@
+{
+  "title": "QUARTER WISE DETAILS",
+  "type": "shareholding_pattern",
+  "last_updated": "2025-07-15 21:27:11",
+  "years": [
+    {
+      "financial_year": "2024-25",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2024/07/shp_q1_2024-25.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2024-25/shp_q1_2024-25.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2024/10/shp_q2_2024-25.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2024-25/shp_q2_2024-25.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2025/01/shp_q3_2024_25.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2024-25/shp_q3_2024_25.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2025/04/shp_31032025.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2024-25/shp_31032025.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2023-24",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2023/07/shp-q1_2324.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2023-24/shp-q1_2324.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2024/04/shp_q2_2023_24.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2023-24/shp_q2_2023_24.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2024/01/shp_q3_2023_24.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2023-24/shp_q3_2023_24.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2024/04/shp_q4_fy2023_24_final.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2023-24/shp_q4_fy2023_24_final.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2022-23",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2022/07/cgr_q1_2223.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2022-23/cgr_q1_2223.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2022/10/cgr_q2_2223.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2022-23/cgr_q2_2223.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2023/01/cgr_q3_2223.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2022-23/cgr_q3_2223.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2023/04/cgr_q4_22_23.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2022-23/cgr_q4_22_23.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2021-22",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2021/07/cgr_q1_2122.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2021-22/cgr_q1_2122.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "https://indianippon.com/wp-content/uploads/2021/10/cgr_q2_2122.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2021-22/cgr_q2_2122.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2022/01/cgr_q3_2122.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2021-22/cgr_q3_2122.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2022/04/cgr_q4_2122.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2021-22/cgr_q4_2122.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2020-21",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/wp-content/uploads/2020/07/cgr_30062020.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2020-21/cgr_30062020.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/wp-content/uploads/2020/10/cg_report_q2_2020_21.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2020-21/cg_report_q2_2020_21.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2021/02/cgr_q3_2020-21.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2020-21/cgr_q3_2020-21.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "https://indianippon.com/wp-content/uploads/2021/04/cgr_q4_2020-21.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2020-21/cgr_q4_2020-21.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2019-20",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/wp-content/uploads/2019/07/cg_30062019120719.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2019-20/cg_30062019120719.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/wp-content/uploads/2019/10/cg_30092019_final.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2019-20/cg_30092019_final.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2020/01/cg_31122019.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2019-20/cg_31122019.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2020/05/cg_31032020.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2019-20/cg_31032020.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2018-19",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/wp-content/uploads/2018/07/cg_30th_june_2018.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2018-19/cg_30th_june_2018.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/wp-content/uploads/2018/10/cg_report-q2-2018-19.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2018-19/cg_report-q2-2018-19.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2019/01/cg_report_htmlformat.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2018-19/cg_report_htmlformat.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2019/04/corporategovernance_31032019.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2018-19/corporategovernance_31032019.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2017-18",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2017.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2017-18/CG_30TH_JUNE_2017.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2017.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2017-18/CG_30TH_SEPTEMBER_2017.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2018/01/CG_31ST_DECEMBER_2017.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2017-18/CG_31ST_DECEMBER_2017.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/wp-content/uploads/2018/04/CG_31ST_MARCH_2018.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2017-18/CG_31ST_MARCH_2018.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2016-17",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2016.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2016-17/CG_30TH_JUNE_2016.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2016.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2016-17/CG_30TH_SEPTEMBER_2016.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2016.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2016-17/CG_31ST_DECEMBER_2016.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2017.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2016-17/CG_31ST_MARCH_2017.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2015-16",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2015.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2015-16/CG_30TH_JUNE_2015.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2015.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2015-16/CG_30TH_SEPTEMBER_2015.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2015.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2015-16/CG_31ST_DECEMBER_2015.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2016.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2015-16/CG_31ST_MARCH_2016.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2014-15",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2014.PDF",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2014-15/CG_30TH_JUNE_2014.PDF"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2014.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2014-15/CG_30TH_SEPTEMBER_2014.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2014.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2014-15/CG_31ST_DECEMBER_2014.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2015.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2014-15/CG_31ST_MARCH_2015.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2013-14",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2013-14/CG_30TH_JUNE_2013.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2013-14/CG_30TH_SEPTEMBER_2013.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2013-14/CG_31ST_DECEMBER_2013.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2014.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2013-14/CG_31ST_MARCH_2014.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2012-13",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2014.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2012-13/CG_30TH_JUNE_2014.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2014.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2012-13/CG_30TH_SEPTEMBER_2014.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2014.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2012-13/CG_31ST_DECEMBER_2014.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2012-13/CG_31ST_MARCH_2013.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2011-12",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2011-12/CG_30TH_JUNE_2013.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2011-12/CG_30TH_SEPTEMBER_2013.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2013.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2011-12/CG_31ST_DECEMBER_2013.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2012.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2011-12/CG_31ST_MARCH_2012.pdf"
+        }
+      }
+    },
+    {
+      "financial_year": "2010-11",
+      "quarters": {
+        "Q1": {
+          "quarter_ended": "Jun 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_JUNE_2012.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2010-11/CG_30TH_JUNE_2012.pdf"
+        },
+        "Q2": {
+          "quarter_ended": "Sept 30th",
+          "download_url": "http://indianippon.com/result/CG_30TH_SEPTEMBER_2012.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2010-11/CG_30TH_SEPTEMBER_2012.pdf"
+        },
+        "Q3": {
+          "quarter_ended": "Dec 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_DECEMBER_2012.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2010-11/CG_31ST_DECEMBER_2012.pdf"
+        },
+        "Q4": {
+          "quarter_ended": "Mar 31st",
+          "download_url": "http://indianippon.com/result/CG_31ST_MARCH_2011.pdf",
+          "s3_url": "https://indian-nippon.s3.ap-south-1.amazonaws.com/investor/disclosure+under+reg46/ShareholdingPattern/2010-11/CG_31ST_MARCH_2011.pdf"
+        }
+      }
+    }
+  ]
+}
