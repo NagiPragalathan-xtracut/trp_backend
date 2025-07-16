@@ -1,7 +1,7 @@
-
 #!/bin/bash
-chmod +x build_files.sh
-echo "starting install..."
-python3.12 -m pip install -r requirements.txt
-python3.12 manage.py collectstatic --noinput
-echo "end install-----------------------"
+
+# Install project dependencies
+pip install -r requirements.txt
+
+# Collect static files
+python manage.py collectstatic --noinput --clear

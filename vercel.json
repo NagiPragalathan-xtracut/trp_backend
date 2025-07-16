@@ -23,8 +23,19 @@
         "dest": "/static/$1"
       },
       {
+        "src": "/swagger/(.*)",
+        "dest": "iitm_backend/wsgi.py"
+      },
+      {
+        "src": "/swagger-ui/(.*)",
+        "dest": "/static/drf-yasg/$1"
+      },
+      {
         "src": "/(.*)",
         "dest": "iitm_backend/wsgi.py"
       }
-    ]
-  }
+    ],
+    "env": {
+      "DJANGO_SETTINGS_MODULE": "iitm_backend.settings"
+    }
+}
