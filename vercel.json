@@ -20,14 +20,17 @@
   "routes": [
     {
       "src": "/static/(.*)",
-      "dest": "/staticfiles/$1"
+      "dest": "/staticfiles/$1",
+      "headers": {
+        "cache-control": "public, max-age=31536000, immutable"
+      }
     },
     {
       "src": "/media/(.*)",
       "dest": "/media/$1"
     },
     {
-      "src": "/(swagger|swagger-ui|redoc)/(.*)",
+      "src": "/(swagger(?:-ui)?|redoc)(?:/.*)?$",
       "dest": "iitm_backend/wsgi.py"
     },
     {

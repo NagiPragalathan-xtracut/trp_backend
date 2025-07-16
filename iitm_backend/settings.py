@@ -203,8 +203,14 @@ SWAGGER_SETTINGS = {
         },
     },
     'VALIDATOR_URL': None,
-    'SWAGGER_UI_DIST': 'SIDECAR',  # Use the sidecar distribution
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+    },
+    'SWAGGER_UI_CSS_URL': 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui.css',
+    'SWAGGER_UI_BUNDLE_JS': 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-bundle.js',
+    'SWAGGER_UI_STANDALONE_PRESET_JS': 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.9.0/swagger-ui-standalone-preset.js',
     'USE_SESSION_AUTH': False,
 }
 
