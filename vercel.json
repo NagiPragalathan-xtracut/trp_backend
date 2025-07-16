@@ -27,7 +27,11 @@
       "dest": "/media/$1"
     },
     {
-      "src": "/(admin|api|swagger|swagger-ui|redoc|__debug__)(.*)",
+      "src": "/(swagger|swagger-ui|redoc)/(.*)",
+      "dest": "iitm_backend/wsgi.py"
+    },
+    {
+      "src": "/(admin|api|__debug__)/(.*)",
       "dest": "iitm_backend/wsgi.py"
     },
     {

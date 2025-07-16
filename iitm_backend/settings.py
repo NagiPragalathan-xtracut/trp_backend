@@ -52,7 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware',  # Add this line
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Uncommented this line
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,7 +62,7 @@ MIDDLEWARE = [
 ]
 
 # Whitenoise configuration
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'  # Changed from CompressedManifestStaticFilesStorage
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 ROOT_URLCONF = 'iitm_backend.urls'
 
@@ -203,6 +203,9 @@ SWAGGER_SETTINGS = {
         },
     },
     'VALIDATOR_URL': None,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # Use the sidecar distribution
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'USE_SESSION_AUTH': False,
 }
 
 # Default primary key field type
