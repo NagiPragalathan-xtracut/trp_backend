@@ -1,0 +1,147 @@
+.inline-group {
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.inline-related h3 {
+    background: #417690;
+    color: white;
+    padding: 8px;
+    border-radius: 3px;
+    margin-top: 0;
+}
+
+.inline-related {
+    margin-bottom: 10px;
+}
+
+.inline-related .form-row {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+.inline-related .form-row:last-child {
+    border-bottom: none;
+}
+
+.image-preview {
+    max-width: 300px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+.field-image_preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Custom styling for the department admin */
+.field-has_ug,
+.field-has_pg,
+.field-has_phd {
+    text-align: center;
+}
+
+/* Style for collapsible sections */
+.collapse {
+    padding: 10px;
+    margin: 10px 0;
+    background: #fff;
+    border-radius: 5px;
+}
+
+/* Style for CKEditor */
+.django-ckeditor-widget {
+    width: 100% !important;
+}
+
+/* Better form layout */
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 12px 0;
+}
+
+.form-row > div {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Better image previews */
+.field-image_preview {
+    margin: 10px 0;
+    padding: 10px;
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Responsive tables */
+.results table {
+    width: 100%;
+    overflow-x: auto;
+    display: block;
+}
+
+/* Better buttons */
+.submit-row input {
+    border-radius: 4px;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
+}
+
+/* Better list display */
+#changelist-form .results {
+    width: 100%;
+    overflow-x: auto;
+}
+
+/* Better filters */
+#changelist-filter h2 {
+    background: #417690;
+    color: white;
+    padding: 10px;
+    margin: 0;
+    border-radius: 4px 4px 0 0;
+}
+
+#changelist-filter {
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+/* Better search */
+#changelist .search-toolbar {
+    padding: 15px;
+    background: #f8f8f8;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+/* Better tabs for inlines */
+.inline-group .tabular tr.has_original td {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+/* Better form controls */
+select, input[type="text"], input[type="number"], input[type="email"], textarea {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100%;
+}
+
+/* Better checkboxes */
+input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+} 
