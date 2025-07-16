@@ -1,41 +1,38 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "iitm_backend/wsgi.py",
-        "use": "@vercel/python",
-        "config": {
-          "maxLambdaSize": "15mb",
-          "runtime": "python3.9"
-        }
-      },
-      {
-        "src": "build_files.sh",
-        "use": "@vercel/static-build",
-        "config": {
-          "distDir": "staticfiles"
-        }
+  "version": 2,
+  "builds": [
+    {
+      "src": "build_files.sh",
+      "use": "@vercel/static-build"
+    },
+    {
+      "src": "iitm_backend/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.9"
       }
-    ],
-    "routes": [
-      {
-        "src": "/static/(.*)",
-        "dest": "/static/$1"
-      },
-      {
-        "src": "/swagger/(.*)",
-        "dest": "iitm_backend/wsgi.py"
-      },
-      {
-        "src": "/swagger-ui/(.*)",
-        "dest": "/static/drf-yasg/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "iitm_backend/wsgi.py"
-      }
-    ],
-    "env": {
-      "DJANGO_SETTINGS_MODULE": "iitm_backend.settings"
     }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
+    {
+      "src": "/media/(.*)",
+      "dest": "/media/$1"
+    },
+    {
+      "src": "/(admin|api|swagger|swagger-ui|redoc|__debug__)(.*)",
+      "dest": "iitm_backend/wsgi.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "iitm_backend/wsgi.py"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "iitm_backend.settings"
+  }
 }
