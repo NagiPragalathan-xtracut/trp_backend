@@ -1,7 +1,12 @@
 #!/bin/bash
+# Make script executable
+chmod +x build_files.sh
 
-# Install project dependencies
-pip install -r requirements.txt
+echo "Installing dependencies..."
+python3.12 -m pip install --upgrade pip
+python3.12 -m pip install -r requirements.txt
 
-# Collect static files
-python manage.py collectstatic --noinput --clear
+echo "Collecting static files..."
+python3.12 manage.py collectstatic --noinput --clear
+
+echo "Build completed!"
