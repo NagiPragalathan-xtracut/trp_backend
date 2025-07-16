@@ -1,11 +1,56 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from base.models.department_model import (
     Department, AboutDepartment, NumberData, QuickLink,
     ProgramOffered, Curriculum, Benefit, DepartmentContact,
     CTA, POPSOPEO, Facility, Banner
 )
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all details for a specific department",
+    operation_id="get_department_detail",
+    manual_parameters=[
+        openapi.Parameter(
+            'department_id',
+            openapi.IN_PATH,
+            description="ID of the department to retrieve",
+            type=openapi.TYPE_INTEGER,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Department details retrieved successfully",
+            examples={
+                "application/json": {
+                    "id": 1,
+                    "name": "Computer Science",
+                    "ug": True,
+                    "pg": True,
+                    "phd": True,
+                    "vision": "string",
+                    "mission": "string",
+                    "about_sections": [],
+                    "quick_links": [],
+                    "programs": [],
+                    "curriculum": [],
+                    "benefits": [],
+                    "contacts": [],
+                    "ctas": [],
+                    "po_pso_peo": [],
+                    "facilities": [],
+                    "banners": []
+                }
+            }
+        ),
+        404: "Department not found"
+    }
+)
+@api_view(['GET'])
 def get_department_detail(request, department_id):
     """Get all details for a specific department"""
     department = get_object_or_404(Department, id=department_id)
@@ -146,8 +191,32 @@ def get_department_detail(request, department_id):
         'banners': banners_data
     }
     
-    return JsonResponse(department_data)
+    return Response(department_data)
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get a list of all departments with basic information",
+    operation_id="get_all_departments",
+    responses={
+        200: openapi.Response(
+            description="List of departments retrieved successfully",
+            examples={
+                "application/json": {
+                    "departments": [
+                        {
+                            "id": 1,
+                            "name": "Computer Science",
+                            "ug": True,
+                            "pg": True,
+                            "phd": True
+                        }
+                    ]
+                }
+            }
+        )
+    }
+)
+@api_view(['GET'])
 def get_all_departments(request):
     """Get a list of all departments with basic information"""
     departments = Department.objects.all()
@@ -162,8 +231,42 @@ def get_all_departments(request):
         for dept in departments
     ]
     
-    return JsonResponse({'departments': departments_data})
+    return Response({'departments': departments_data})
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all programs for a specific department",
+    operation_id="get_department_programs",
+    manual_parameters=[
+        openapi.Parameter(
+            'department_id',
+            openapi.IN_PATH,
+            description="ID of the department to retrieve programs for",
+            type=openapi.TYPE_INTEGER,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Department programs retrieved successfully",
+            examples={
+                "application/json": {
+                    "programs": [
+                        {
+                            "name": "string",
+                            "description": "string",
+                            "image": "url_string",
+                            "explore_link": "string",
+                            "apply_link": "string"
+                        }
+                    ]
+                }
+            }
+        ),
+        404: "Department not found"
+    }
+)
+@api_view(['GET'])
 def get_department_programs(request, department_id):
     """Get all programs for a specific department"""
     department = get_object_or_404(Department, id=department_id)
@@ -180,8 +283,43 @@ def get_department_programs(request, department_id):
         for prog in programs
     ]
     
-    return JsonResponse({'programs': programs_data})
+    return Response({'programs': programs_data})
 
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all facilities for a specific department",
+    operation_id="get_department_facilities",
+    manual_parameters=[
+        openapi.Parameter(
+            'department_id',
+            openapi.IN_PATH,
+            description="ID of the department to retrieve facilities for",
+            type=openapi.TYPE_INTEGER,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Department facilities retrieved successfully",
+            examples={
+                "application/json": {
+                    "facilities": [
+                        {
+                            "heading": "string",
+                            "description": "string",
+                            "image": "url_string",
+                            "alt": "string",
+                            "link_blank": "string",
+                            "content": "string"
+                        }
+                    ]
+                }
+            }
+        ),
+        404: "Department not found"
+    }
+)
+@api_view(['GET'])
 def get_department_facilities(request, department_id):
     """Get all facilities for a specific department"""
     department = get_object_or_404(Department, id=department_id)
@@ -199,4 +337,4 @@ def get_department_facilities(request, department_id):
         for fac in facilities
     ]
     
-    return JsonResponse({'facilities': facilities_data}) 
+    return Response({'facilities': facilities_data}) 

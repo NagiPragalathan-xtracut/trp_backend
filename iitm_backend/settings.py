@@ -46,6 +46,8 @@ INSTALLED_APPS = [
     'ckeditor',
     'storages',
     'base.apps.BaseConfig',
+    'rest_framework',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -158,6 +160,37 @@ CKEDITOR_CONFIGS = {
         'height': 300,
         'width': '100%',
     },
+}
+
+# DRF Settings
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema',
+}
+
+# Swagger Settings
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'basic': {
+            'type': 'basic'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+    'OPERATIONS_SORTER': 'alpha',
+    'TAGS_SORTER': 'alpha',
+    'DOC_EXPANSION': 'none',
+    'DEFAULT_MODEL_RENDERING': 'model',
+    'DEFAULT_INFO': {
+        'title': 'IITM Department API',
+        'description': 'API for managing department information at IITM',
+        'version': 'v1',
+        'contact': {
+            'name': 'API Support',
+            'email': 'support@example.com'
+        },
+        'license': {
+            'name': 'MIT License',
+        },
+    }
 }
 
 # Default primary key field type
