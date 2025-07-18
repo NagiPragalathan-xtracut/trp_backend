@@ -16,8 +16,8 @@ $PYTHON_COMMAND -m pip install -r requirements.txt
 # Create the output directory if it doesn't exist
 mkdir -p staticfiles_build
 
-# Run collectstatic and specify the output directory
-$PYTHON_COMMAND manage.py collectstatic --noinput --output-dir staticfiles_build
+# Run collectstatic
+STATIC_ROOT=staticfiles_build $PYTHON_COMMAND manage.py collectstatic --noinput
 
 # Move the media directory only if it exists
 if [ -d "media" ]; then
