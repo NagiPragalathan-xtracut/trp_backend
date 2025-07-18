@@ -10,15 +10,16 @@ else
     PYTHON_COMMAND="python3"  # Fallback to default Python 3 version
 fi
 
-  
-# Replace `python3.11.5` with `$PYTHON_COMMAND`
-$PYTHON_COMMAND manage.py collectstatic --noinput
-
+# Install dependencies
 $PYTHON_COMMAND -m pip install -r requirements.txt
+
 # Create the output directory if it doesn't exist
 mkdir -p staticfiles_build
 
+# Run collectstatic and specify the output directory
+$PYTHON_COMMAND manage.py collectstatic --noinput --output-dir staticfiles_build
+
 # Move the media directory only if it exists
 if [ -d "media" ]; then
-    mv media staticfiles_build
+    cp -r media staticfiles_build/
 fi
