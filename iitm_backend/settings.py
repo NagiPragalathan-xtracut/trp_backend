@@ -91,10 +91,10 @@ WSGI_APPLICATION = 'iitm_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'u101694785_inel',
-        'USER': 'u101694785_inel',
-        'PASSWORD': '4:]|;9HyLKp',
-        'HOST': '217.21.88.5',
+        'NAME': 'u753036200_trpcollege',
+        'USER': 'u753036200_trpcollege',
+        'PASSWORD': 'x&Vu5I/0J',
+        'HOST': '194.59.164.62',
         'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
