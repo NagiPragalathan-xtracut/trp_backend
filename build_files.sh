@@ -18,5 +18,7 @@ $PYTHON_COMMAND -m pip install -r requirements.txt
 # Create the output directory if it doesn't exist
 mkdir -p staticfiles_build
 
-# Move the static files into the output directory
-mv media staticfiles_build
+# Move the media directory only if it exists
+if [ -d "media" ]; then
+    mv media staticfiles_build
+fi
