@@ -5,6 +5,11 @@ from base.models.department_model import (
     ProgramOffered, Curriculum, Benefit, DepartmentContact,
     CTA, POPSOPEO, Facility, Banner
 )
+from base.models.course_model import (
+    Course, AboutTheCourseModel, NumberDataATD, QuickLinksModel,
+    SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
+    CourseContact, CTAModel, CourseBanner
+)
 
 class NumberDataInline(admin.TabularInline):
     model = NumberData
@@ -147,3 +152,138 @@ class BannerAdmin(admin.ModelAdmin):
     list_display = ['department', 'alt']
     list_filter = ['department']
     search_fields = ['alt']
+
+
+# Course Model Admin Configurations
+
+class NumberDataATDInline(admin.TabularInline):
+    model = NumberDataATD
+    extra = 1
+
+class AboutTheCourseInline(admin.StackedInline):
+    model = AboutTheCourseModel
+    extra = 1
+
+class QuickLinksInline(admin.TabularInline):
+    model = QuickLinksModel
+    extra = 1
+
+class SubjectsInline(admin.StackedInline):
+    model = SubjectsModel
+    extra = 1
+
+class LabInline(admin.StackedInline):
+    model = LabModel
+    extra = 1
+
+class CurriculumCourseInline(admin.StackedInline):
+    model = CurriculumModel
+    extra = 1
+
+class BenefitsInline(admin.TabularInline):
+    model = BenefitsModel
+    extra = 1
+
+class CourseContactInline(admin.StackedInline):
+    model = CourseContact
+    extra = 1
+
+class CTACourseInline(admin.TabularInline):
+    model = CTAModel
+    extra = 1
+
+class CourseBannerInline(admin.StackedInline):
+    model = CourseBanner
+    extra = 1
+
+@admin.register(Course)
+class CourseAdmin(admin.ModelAdmin):
+    list_display = ['name', 'has_ug', 'has_pg', 'has_phd', 'created_at']
+    list_filter = ['ug', 'pg', 'phd', 'created_at']
+    search_fields = ['name']
+    
+    inlines = [
+        CourseBannerInline,
+        AboutTheCourseInline,
+        QuickLinksInline,
+        SubjectsInline,
+        LabInline,
+        CurriculumCourseInline,
+        BenefitsInline,
+        CourseContactInline,
+        CTACourseInline,
+    ]
+    
+    def has_ug(self, obj):
+        return '✓' if obj.ug else '✗'
+    has_ug.short_description = 'UG'
+    
+    def has_pg(self, obj):
+        return '✓' if obj.pg else '✗'
+    has_pg.short_description = 'PG'
+    
+    def has_phd(self, obj):
+        return '✓' if obj.phd else '✗'
+    has_phd.short_description = 'PhD'
+
+@admin.register(AboutTheCourseModel)
+class AboutTheCourseModelAdmin(admin.ModelAdmin):
+    list_display = ['course', 'heading', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['heading', 'course__name']
+    inlines = [NumberDataATDInline]
+
+@admin.register(NumberDataATD)
+class NumberDataATDAdmin(admin.ModelAdmin):
+    list_display = ['text', 'number', 'symbol', 'featured', 'unique_id']
+    list_filter = ['featured', 'symbol']
+    search_fields = ['text', 'number']
+    readonly_fields = ['unique_id']
+
+@admin.register(QuickLinksModel)
+class QuickLinksModelAdmin(admin.ModelAdmin):
+    list_display = ['name', 'link', 'course', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['name', 'course__name']
+
+@admin.register(SubjectsModel)
+class SubjectsModelAdmin(admin.ModelAdmin):
+    list_display = ['name', 'course', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['name', 'course__name']
+
+@admin.register(LabModel)
+class LabModelAdmin(admin.ModelAdmin):
+    list_display = ['heading', 'course', 'link_blank', 'created_at']
+    list_filter = ['course', 'link_blank', 'created_at']
+    search_fields = ['heading', 'course__name']
+
+@admin.register(CurriculumModel)
+class CurriculumModelAdmin(admin.ModelAdmin):
+    list_display = ['name', 'course', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['name', 'course__name']
+
+@admin.register(BenefitsModel)
+class BenefitsModelAdmin(admin.ModelAdmin):
+    list_display = ['text', 'course', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['text', 'course__name']
+
+@admin.register(CourseContact)
+class CourseContactAdmin(admin.ModelAdmin):
+    list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
+    list_filter = ['course', 'position', 'created_at']
+    search_fields = ['name', 'mail', 'phone', 'course__name']
+
+@admin.register(CTAModel)
+class CTAModelAdmin(admin.ModelAdmin):
+    list_display = ['heading', 'link', 'course', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['heading', 'course__name']
+
+@admin.register(CourseBanner)
+class CourseBannerAdmin(admin.ModelAdmin):
+    list_display = ['course', 'alt', 'created_at']
+    list_filter = ['course', 'created_at']
+    search_fields = ['alt', 'course__name']
