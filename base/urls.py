@@ -7,7 +7,8 @@ from base.views.document_view import (
 )
 from base.views.course_view import (
     get_all_courses,
-    get_course_detail,
+    get_course_by_name,
+    search_courses_by_name,
     get_course_quick_links,
     get_course_subjects,
     get_course_labs,
@@ -28,7 +29,8 @@ urlpatterns = [
     
     # Course API v1 endpoints
     path('v1/courses/', get_all_courses, name='courses_list'),
-    path('v1/courses/<int:course_id>/', get_course_detail, name='course_detail'),
+    path('v1/courses/name/<str:course_name>/', get_course_by_name, name='course_by_name'),
+    path('v1/courses/search/<str:search_term>/', search_courses_by_name, name='search_courses'),
     path('v1/courses/<int:course_id>/quick-links/', get_course_quick_links, name='course_quick_links'),
     path('v1/courses/<int:course_id>/subjects/', get_course_subjects, name='course_subjects'),
     path('v1/courses/<int:course_id>/labs/', get_course_labs, name='course_labs'),

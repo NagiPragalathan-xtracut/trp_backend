@@ -180,14 +180,14 @@ def get_all_courses(request):
 
 @swagger_auto_schema(
     method='get',
-    operation_description="Get all details for a specific course",
-    operation_id="get_course_detail",
+    operation_description="Get complete course details by course name with all related data",
+    operation_id="get_course_by_name",
     manual_parameters=[
         openapi.Parameter(
-            'course_id',
+            'course_name',
             openapi.IN_PATH,
-            description="ID of the course to retrieve",
-            type=openapi.TYPE_INTEGER,
+            description="Name of the course to retrieve (case-insensitive)",
+            type=openapi.TYPE_STRING,
             required=True
         )
     ],
@@ -222,10 +222,18 @@ def get_all_courses(request):
     }
 )
 @api_view(['GET'])
-def get_course_detail(request, course_id):
-    """Get complete course details with all related data"""
-    course = get_object_or_404(Course, id=course_id)
+def get_course_by_name(request, course_name):
+    """Get complete course details by name with all related data"""
+    try:
+        # Case-insensitive search for course by name
+        course = Course.objects.get(name__iexact=course_name)
+    except Course.DoesNotExist:
+        return Response(
+            {"error": f"Course '{course_name}' not found"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
     
+    # Return the same comprehensive data structure as get_course_detail
     course_dto = {
         'course': course_to_dto(course),
         'about_sections': [about_course_to_dto(about) for about in course.about_sections.all()],
@@ -240,6 +248,57 @@ def get_course_detail(request, course_id):
     }
     
     return Response(course_dto, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Search courses by name (partial match)",
+    operation_id="search_courses_by_name",
+    manual_parameters=[
+        openapi.Parameter(
+            'search_term',
+            openapi.IN_PATH,
+            description="Search term to find courses (partial match, case-insensitive)",
+            type=openapi.TYPE_STRING,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Courses found successfully",
+            examples={
+                "application/json": [
+                    {
+                        "id": 1,
+                        "name": "Computer Science",
+                        "ug": True,
+                        "pg": True,
+                        "phd": True,
+                        "about_the_course": "About CS course",
+                        "vision": "<p>Vision content</p>",
+                        "mission": "<p>Mission content</p>",
+                        "created_at": "2024-01-01T00:00:00Z",
+                        "updated_at": "2024-01-01T00:00:00Z"
+                    }
+                ]
+            }
+        ),
+        404: openapi.Response(description="No courses found")
+    }
+)
+@api_view(['GET'])
+def search_courses_by_name(request, search_term):
+    """Search courses by name with partial matching"""
+    courses = Course.objects.filter(name__icontains=search_term)
+    
+    if not courses.exists():
+        return Response(
+            {"error": f"No courses found matching '{search_term}'"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+    
+    courses_dto = [course_to_dto(course) for course in courses]
+    return Response(courses_dto, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
@@ -412,3 +471,68 @@ def get_featured_number_data(request):
     featured_data = NumberDataATD.objects.filter(featured=True)
     featured_dto = [number_data_to_dto(data) for data in featured_data]
     return Response(featured_dto, status=status.HTTP_200_OK) 
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get complete course details by course ID with all related data",
+    operation_id="get_course_detail",
+    manual_parameters=[
+        openapi.Parameter(
+            'course_id',
+            openapi.IN_PATH,
+            description="ID of the course to retrieve",
+            type=openapi.TYPE_INTEGER,
+            required=True
+        )
+    ],
+    responses={
+        200: openapi.Response(
+            description="Course details retrieved successfully",
+            examples={
+                "application/json": {
+                    "course": {
+                        "id": 1,
+                        "name": "Computer Science",
+                        "ug": True,
+                        "pg": True,
+                        "phd": True,
+                        "about_the_course": "About CS course",
+                        "vision": "<p>Vision content</p>",
+                        "mission": "<p>Mission content</p>"
+                    },
+                    "about_sections": [],
+                    "quick_links": [],
+                    "subjects": [],
+                    "labs": [],
+                    "curriculum": [],
+                    "benefits": [],
+                    "contacts": [],
+                    "cta_sections": [],
+                    "banners": []
+                }
+            }
+        ),
+        404: openapi.Response(description="Course not found")
+    }
+)
+@api_view(['GET'])
+def get_course_detail(request, course_id):
+    """Get complete course details by ID with all related data"""
+    course = get_object_or_404(Course, id=course_id)
+    
+    # Return the same comprehensive data structure as get_course_by_name
+    course_dto = {
+        'course': course_to_dto(course),
+        'about_sections': [about_course_to_dto(about) for about in course.about_sections.all()],
+        'quick_links': [quick_link_to_dto(link) for link in course.quick_links.all()],
+        'subjects': [subject_to_dto(subject) for subject in course.subjects.all()],
+        'labs': [lab_to_dto(lab) for lab in course.labs.all()],
+        'curriculum': [curriculum_to_dto(curr) for curr in course.curriculum.all()],
+        'benefits': [benefit_to_dto(benefit) for benefit in course.benefits.all()],
+        'contacts': [contact_to_dto(contact) for contact in course.contacts.all()],
+        'cta_sections': [cta_to_dto(cta) for cta in course.cta_sections.all()],
+        'banners': [banner_to_dto(banner) for banner in course.banners.all()],
+    }
+    
+    return Response(course_dto, status=status.HTTP_200_OK) 
