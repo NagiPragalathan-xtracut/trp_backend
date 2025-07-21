@@ -10,6 +10,13 @@ from base.models.course_model import (
     SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
     CourseContact, CTAModel, CourseBanner
 )
+from base.models.faculty_model import (
+    Faculty, Designation, FacultyBanner
+)
+
+# ============================================================================
+# DEPARTMENT MODELS - INLINE CONFIGURATIONS
+# ============================================================================
 
 class NumberDataInline(admin.TabularInline):
     model = NumberData
@@ -55,6 +62,62 @@ class BannerInline(admin.StackedInline):
     model = Banner
     extra = 1
 
+# ============================================================================
+# COURSE MODELS - INLINE CONFIGURATIONS
+# ============================================================================
+
+class NumberDataATDInline(admin.TabularInline):
+    model = NumberDataATD
+    extra = 1
+
+class AboutTheCourseInline(admin.StackedInline):
+    model = AboutTheCourseModel
+    extra = 1
+
+class QuickLinksInline(admin.TabularInline):
+    model = QuickLinksModel
+    extra = 1
+
+class SubjectsInline(admin.StackedInline):
+    model = SubjectsModel
+    extra = 1
+
+class LabInline(admin.StackedInline):
+    model = LabModel
+    extra = 1
+
+class CurriculumCourseInline(admin.StackedInline):
+    model = CurriculumModel
+    extra = 1
+
+class BenefitsInline(admin.TabularInline):
+    model = BenefitsModel
+    extra = 1
+
+class CourseContactInline(admin.StackedInline):
+    model = CourseContact
+    extra = 1
+
+class CTACourseInline(admin.TabularInline):
+    model = CTAModel
+    extra = 1
+
+class CourseBannerInline(admin.StackedInline):
+    model = CourseBanner
+    extra = 1
+
+# ============================================================================
+# FACULTY MODELS - INLINE CONFIGURATIONS
+# ============================================================================
+
+class FacultyBannerInline(admin.StackedInline):
+    model = FacultyBanner
+    extra = 1
+
+# ============================================================================
+# DEPARTMENT ADMIN CONFIGURATIONS
+# ============================================================================
+
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
     list_display = ['name', 'has_ug', 'has_pg', 'has_phd']
@@ -86,6 +149,7 @@ class DepartmentAdmin(admin.ModelAdmin):
         return '✓' if obj.phd else '✗'
     has_phd.short_description = 'PhD'
 
+# Department Related Models
 @admin.register(AboutDepartment)
 class AboutDepartmentAdmin(admin.ModelAdmin):
     list_display = ['department', 'heading']
@@ -153,48 +217,9 @@ class BannerAdmin(admin.ModelAdmin):
     list_filter = ['department']
     search_fields = ['alt']
 
-
-# Course Model Admin Configurations
-
-class NumberDataATDInline(admin.TabularInline):
-    model = NumberDataATD
-    extra = 1
-
-class AboutTheCourseInline(admin.StackedInline):
-    model = AboutTheCourseModel
-    extra = 1
-
-class QuickLinksInline(admin.TabularInline):
-    model = QuickLinksModel
-    extra = 1
-
-class SubjectsInline(admin.StackedInline):
-    model = SubjectsModel
-    extra = 1
-
-class LabInline(admin.StackedInline):
-    model = LabModel
-    extra = 1
-
-class CurriculumCourseInline(admin.StackedInline):
-    model = CurriculumModel
-    extra = 1
-
-class BenefitsInline(admin.TabularInline):
-    model = BenefitsModel
-    extra = 1
-
-class CourseContactInline(admin.StackedInline):
-    model = CourseContact
-    extra = 1
-
-class CTACourseInline(admin.TabularInline):
-    model = CTAModel
-    extra = 1
-
-class CourseBannerInline(admin.StackedInline):
-    model = CourseBanner
-    extra = 1
+# ============================================================================
+# COURSE ADMIN CONFIGURATIONS
+# ============================================================================
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
@@ -226,6 +251,7 @@ class CourseAdmin(admin.ModelAdmin):
         return '✓' if obj.phd else '✗'
     has_phd.short_description = 'PhD'
 
+# Course Related Models
 @admin.register(AboutTheCourseModel)
 class AboutTheCourseModelAdmin(admin.ModelAdmin):
     list_display = ['course', 'heading', 'created_at']
@@ -287,3 +313,60 @@ class CourseBannerAdmin(admin.ModelAdmin):
     list_display = ['course', 'alt', 'created_at']
     list_filter = ['course', 'created_at']
     search_fields = ['alt', 'course__name']
+
+# ============================================================================
+# FACULTY ADMIN CONFIGURATIONS
+# ============================================================================
+
+@admin.register(Designation)
+class DesignationAdmin(admin.ModelAdmin):
+    list_display = ['name', 'unique_id', 'faculty_count', 'created_at']
+    search_fields = ['name']
+    readonly_fields = ['unique_id']
+    
+    def faculty_count(self, obj):
+        return obj.faculty_members.count()
+    faculty_count.short_description = 'Faculty Count'
+
+@admin.register(Faculty)
+class FacultyAdmin(admin.ModelAdmin):
+    list_display = ['name', 'designation', 'department', 'mail_id', 'phone_number', 'created_at']
+    list_filter = ['designation', 'department', 'created_at']
+    search_fields = ['name', 'mail_id', 'designation__name', 'department__name']
+    list_select_related = ['designation', 'department']
+    
+    inlines = [
+        FacultyBannerInline,
+    ]
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'alt', 'image', 'designation', 'department')
+        }),
+        ('Contact Information', {
+            'fields': ('mail_id', 'phone_number', 'link')
+        }),
+        ('Content', {
+            'fields': ('content', 'qualification', 'bio')
+        }),
+        ('Professional Information', {
+            'fields': ('publication', 'awards', 'workshop', 'work_experience', 'projects'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(FacultyBanner)
+class FacultyBannerAdmin(admin.ModelAdmin):
+    list_display = ['faculty', 'alt', 'created_at']
+    list_filter = ['faculty', 'created_at']
+    search_fields = ['faculty__name', 'alt']
+    list_select_related = ['faculty']
+
+# ============================================================================
+# CUSTOM ADMIN SITE CONFIGURATION
+# ============================================================================
+
+# Customize admin site appearance
+admin.site.site_header = "IITM Backend Administration"
+admin.site.site_title = "IITM Admin Portal"
+admin.site.index_title = "Welcome to IITM Backend Administration"
