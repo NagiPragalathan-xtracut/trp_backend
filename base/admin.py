@@ -22,6 +22,9 @@ from base.models.forms_models import (
 from base.models.achivements_model import (
     CollegeAchievement, StudentAchievement
 )
+from base.models.carrer_model import (
+    CareerOpening, CareerSuccess
+)
 
 # ============================================================================
 # DEPARTMENT MODELS - INLINE CONFIGURATIONS
@@ -519,6 +522,79 @@ class StudentAchievementAdmin(admin.ModelAdmin):
             )
         return "No Image"
     image_preview.short_description = 'Image Preview'
+
+# ============================================================================
+# CAREER ADMIN CONFIGURATIONS
+# ============================================================================
+
+@admin.register(CareerOpening)
+class CareerOpeningAdmin(admin.ModelAdmin):
+    list_display = ['opening_position', 'category', 'department', 'is_active', 'created_at']
+    list_filter = ['category', 'department', 'is_active', 'created_at']
+    search_fields = ['opening_position', 'current_opening', 'description', 'department__name']
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('current_opening', 'category', 'opening_position', 'department')
+        }),
+        ('Details', {
+            'fields': ('eligibility', 'description', 'apply_link')
+        }),
+        ('Status', {
+            'fields': ('is_active',)
+        }),
+        ('System Fields', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(CareerSuccess)
+class CareerSuccessAdmin(admin.ModelAdmin):
+    list_display = ['student_name', 'year_with_degree', 'department', 'batch', 'student_image_preview', 'company_image_preview', 'created_at']
+    list_filter = ['department', 'batch', 'created_at']
+    search_fields = ['student_name', 'year_with_degree', 'description', 'department__name', 'batch']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'student_image_preview', 'company_image_preview']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Student Information', {
+            'fields': ('student_name', 'year_with_degree', 'batch', 'department')
+        }),
+        ('Student Media', {
+            'fields': ('image', 'student_image_preview', 'alt')
+        }),
+        ('Company Media', {
+            'fields': ('company_image', 'company_image_preview')
+        }),
+        ('Content', {
+            'fields': ('description',)
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def student_image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                obj.image.url
+            )
+        return "No Image"
+    student_image_preview.short_description = 'Student Image'
+    
+    def company_image_preview(self, obj):
+        if obj.company_image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                obj.company_image.url
+            )
+        return "No Image"
+    company_image_preview.short_description = 'Company Image'
 
 # ============================================================================
 # CUSTOM ADMIN SITE CONFIGURATION

@@ -62,6 +62,18 @@ from base.views.achievement_views import (
     update_student_achievement,
     delete_student_achievement
 )
+from base.views.carrer_views import (
+    create_career_opening,
+    get_all_career_openings,
+    get_career_opening,
+    update_career_opening,
+    delete_career_opening,
+    create_career_success,
+    get_all_career_successes,
+    get_career_success,
+    update_career_success,
+    delete_career_success
+)
 
 app_name = 'base'
 
@@ -128,4 +140,16 @@ urlpatterns = [
     path('v1/achievements/student/<int:achievement_id>/', get_student_achievement, name='get_student_achievement'),
     path('v1/achievements/student/<int:achievement_id>/update/', update_student_achievement, name='update_student_achievement'),
     path('v1/achievements/student/<int:achievement_id>/delete/', delete_student_achievement, name='delete_student_achievement'),
+    
+    # Career API v1 endpoints
+    path('v1/career/openings/', get_all_career_openings, name='get_all_career_openings'),
+    path('v1/career/openings/create/', create_career_opening, name='create_career_opening'),
+    path('v1/career/openings/<int:opening_id>/', get_career_opening, name='get_career_opening'),
+    path('v1/career/openings/<int:opening_id>/update/', update_career_opening, name='update_career_opening'),
+    path('v1/career/openings/<int:opening_id>/delete/', delete_career_opening, name='delete_career_opening'),
+    path('v1/career/successes/', get_all_career_successes, name='get_all_career_successes'),
+    path('v1/career/successes/create/', create_career_success, name='create_career_success'),
+    path('v1/career/successes/<int:success_id>/', get_career_success, name='get_career_success'),
+    path('v1/career/successes/<int:success_id>/update/', update_career_success, name='update_career_success'),
+    path('v1/career/successes/<int:success_id>/delete/', delete_career_success, name='delete_career_success'),
 ] 
