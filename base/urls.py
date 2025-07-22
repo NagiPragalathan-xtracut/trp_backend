@@ -74,6 +74,18 @@ from base.views.carrer_views import (
     update_career_success,
     delete_career_success
 )
+from base.views.news_events_views import (
+    create_news_event,
+    get_all_news_events,
+    get_news_event,
+    update_news_event,
+    delete_news_event,
+    create_tag,
+    get_all_tags,
+    create_image,
+    get_all_images,
+    create_metadata
+)
 
 app_name = 'base'
 
@@ -152,4 +164,22 @@ urlpatterns = [
     path('v1/career/successes/<int:success_id>/', get_career_success, name='get_career_success'),
     path('v1/career/successes/<int:success_id>/update/', update_career_success, name='update_career_success'),
     path('v1/career/successes/<int:success_id>/delete/', delete_career_success, name='delete_career_success'),
+    
+    # News & Events API v1 endpoints
+    path('v1/news-events/', get_all_news_events, name='get_all_news_events'),
+    path('v1/news-events/create/', create_news_event, name='create_news_event'),
+    path('v1/news-events/<int:news_id>/', get_news_event, name='get_news_event'),
+    path('v1/news-events/<int:news_id>/update/', update_news_event, name='update_news_event'),
+    path('v1/news-events/<int:news_id>/delete/', delete_news_event, name='delete_news_event'),
+    
+    # Tags API v1 endpoints
+    path('v1/tags/', get_all_tags, name='get_all_tags'),
+    path('v1/tags/create/', create_tag, name='create_tag'),
+    
+    # Images API v1 endpoints
+    path('v1/images/', get_all_images, name='get_all_images'),
+    path('v1/images/create/', create_image, name='create_image'),
+    
+    # Metadata API v1 endpoints
+    path('v1/metadata/create/', create_metadata, name='create_metadata'),
 ] 

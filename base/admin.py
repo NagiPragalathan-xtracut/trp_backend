@@ -25,6 +25,9 @@ from base.models.achivements_model import (
 from base.models.carrer_model import (
     CareerOpening, CareerSuccess
 )
+from base.models.news_events_models import (
+    NewsEvents, MetaData, TagModel, ImageModel
+)
 
 # ============================================================================
 # DEPARTMENT MODELS - INLINE CONFIGURATIONS
@@ -595,6 +598,130 @@ class CareerSuccessAdmin(admin.ModelAdmin):
             )
         return "No Image"
     company_image_preview.short_description = 'Company Image'
+
+# ============================================================================
+# NEWS & EVENTS ADMIN CONFIGURATIONS
+# ============================================================================
+
+class ImageModelInline(admin.TabularInline):
+    model = NewsEvents.images.through
+    extra = 1
+    verbose_name = "Image"
+    verbose_name_plural = "Images"
+
+class TagModelInline(admin.TabularInline):
+    model = NewsEvents.tags.through
+    extra = 1
+    verbose_name = "Tag"
+    verbose_name_plural = "Tags"
+
+@admin.register(MetaData)
+class MetaDataAdmin(admin.ModelAdmin):
+    list_display = ['page_id', 'title', 'sitename', 'locale', 'type', 'created_at']
+    list_filter = ['locale', 'type', 'created_at']
+    search_fields = ['page_id', 'title', 'description', 'sitename', 'author']
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('page_id', 'title', 'sitename', 'author')
+        }),
+        ('SEO Meta Tags', {
+            'fields': ('description', 'url', 'canonical_url', 'image')
+        }),
+        ('Technical Settings', {
+            'fields': ('locale', 'type', 'charset', 'viewport', 'robots')
+        }),
+        ('System Fields', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(TagModel)
+class TagModelAdmin(admin.ModelAdmin):
+    list_display = ['tag_name', 'unique_id', 'news_events_count', 'created_at']
+    search_fields = ['tag_name']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at']
+    ordering = ['tag_name']
+    
+    def news_events_count(self, obj):
+        return obj.news_events.count()
+    news_events_count.short_description = 'News & Events Count'
+
+@admin.register(ImageModel)
+class ImageModelAdmin(admin.ModelAdmin):
+    list_display = ['alt', 'image_preview', 'is_active', 'news_events_count', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    search_fields = ['alt']
+    readonly_fields = ['created_at', 'updated_at', 'image_preview']
+    ordering = ['-created_at']
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                obj.image.url
+            )
+        return "No Image"
+    image_preview.short_description = 'Image Preview'
+    
+    def news_events_count(self, obj):
+        return obj.news_events.count()
+    news_events_count.short_description = 'News & Events Count'
+
+@admin.register(NewsEvents)
+class NewsEventsAdmin(admin.ModelAdmin):
+    list_display = ['heading', 'category', 'department', 'date', 'is_published', 'is_featured', 'primary_image_preview', 'tags_display', 'created_at']
+    list_filter = ['category', 'department', 'is_published', 'is_featured', 'date', 'created_at', 'tags']
+    search_fields = ['heading', 'content', 'department__name', 'tags__tag_name']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'primary_image_preview']
+    filter_horizontal = ['tags', 'images']
+    date_hierarchy = 'date'
+    ordering = ['-date', '-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('heading', 'category', 'department', 'date')
+        }),
+        ('Content', {
+            'fields': ('content', 'link')
+        }),
+        ('Media & Tags', {
+            'fields': ('images', 'tags', 'primary_image_preview')
+        }),
+        ('SEO & Metadata', {
+            'fields': ('metadata',)
+        }),
+        ('Status', {
+            'fields': ('is_published', 'is_featured')
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def primary_image_preview(self, obj):
+        primary_image = obj.get_primary_image()
+        if primary_image and primary_image.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                primary_image.image.url
+            )
+        return "No Primary Image"
+    primary_image_preview.short_description = 'Primary Image'
+    
+    def tags_display(self, obj):
+        tags = obj.tags.all()[:3]  # Show first 3 tags
+        if not tags:
+            return "No Tags"
+        tag_names = [tag.tag_name for tag in tags]
+        if obj.tags.count() > 3:
+            tag_names.append(f"... +{obj.tags.count() - 3} more")
+        return ", ".join(tag_names)
+    tags_display.short_description = 'Tags'
 
 # ============================================================================
 # CUSTOM ADMIN SITE CONFIGURATION
