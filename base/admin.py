@@ -13,6 +13,9 @@ from base.models.course_model import (
 from base.models.faculty_model import (
     Faculty, Designation, FacultyBanner
 )
+from base.models.commitee_model import (
+    Committee, CommitteeCategory
+)
 
 # ============================================================================
 # DEPARTMENT MODELS - INLINE CONFIGURATIONS
@@ -113,6 +116,28 @@ class CourseBannerInline(admin.StackedInline):
 class FacultyBannerInline(admin.StackedInline):
     model = FacultyBanner
     extra = 1
+
+# ============================================================================
+# COMMITTEE ADMIN CONFIGURATIONS
+# ============================================================================
+
+@admin.register(CommitteeCategory)
+class CommitteeCategoryAdmin(admin.ModelAdmin):
+    list_display = ['name', 'unique_id', 'member_count', 'created_at']
+    search_fields = ['name']
+    readonly_fields = ['unique_id']
+    
+    def member_count(self, obj):
+        return obj.committees.count()
+    member_count.short_description = 'Members'
+
+@admin.register(Committee)
+class CommitteeAdmin(admin.ModelAdmin):
+    list_display = ['name_of_member', 'designation', 'position', 'category', 'created_at']
+    list_filter = ['category', 'designation', 'position']
+    search_fields = ['name_of_member', 'designation', 'position', 'category__name']
+    list_select_related = ['category']
+    ordering = ['category', 'position', 'name_of_member']
 
 # ============================================================================
 # DEPARTMENT ADMIN CONFIGURATIONS

@@ -7,6 +7,7 @@ from base.views.document_view import (
 )
 from base.views.course_view import (
     get_all_courses,
+    get_course_detail,
     get_course_by_name,
     search_courses_by_name,
     get_course_quick_links,
@@ -28,6 +29,18 @@ from base.views.faculty_views import (
     get_faculty_by_designation,
     get_faculty_banners
 )
+from base.views.commitee_views import (
+    get_all_committee_categories,
+    create_committee_category,
+    update_committee_category,
+    delete_committee_category,
+    get_all_committee_members,
+    create_committee_member,
+    get_committee_member,
+    update_committee_member,
+    delete_committee_member,
+    search_committee_members
+)
 
 app_name = 'base'
 
@@ -40,6 +53,7 @@ urlpatterns = [
     
     # Course API v1 endpoints
     path('v1/courses/', get_all_courses, name='courses_list'),
+    path('v1/courses/<int:course_id>/', get_course_detail, name='course_detail'),
     path('v1/courses/name/<str:course_name>/', get_course_by_name, name='course_by_name'),
     path('v1/courses/search/<str:search_term>/', search_courses_by_name, name='search_courses'),
     path('v1/courses/<int:course_id>/quick-links/', get_course_quick_links, name='course_quick_links'),
@@ -60,4 +74,16 @@ urlpatterns = [
     path('v1/faculty/department/<int:department_id>/', get_faculty_by_department, name='faculty_by_department'),
     path('v1/faculty/designation/<int:designation_id>/', get_faculty_by_designation, name='faculty_by_designation'),
     path('v1/faculty/<int:faculty_id>/banners/', get_faculty_banners, name='faculty_banners'),
+    
+    # Committee API v1 endpoints
+    path('v1/committee/categories/', get_all_committee_categories, name='committee_categories_list'),
+    path('v1/committee/categories/create/', create_committee_category, name='create_committee_category'),
+    path('v1/committee/categories/<int:category_id>/update/', update_committee_category, name='update_committee_category'),
+    path('v1/committee/categories/<int:category_id>/delete/', delete_committee_category, name='delete_committee_category'),
+    path('v1/committee/members/', get_all_committee_members, name='committee_members_list'),
+    path('v1/committee/members/create/', create_committee_member, name='create_committee_member'),
+    path('v1/committee/members/<int:member_id>/', get_committee_member, name='get_committee_member'),
+    path('v1/committee/members/<int:member_id>/update/', update_committee_member, name='update_committee_member'),
+    path('v1/committee/members/<int:member_id>/delete/', delete_committee_member, name='delete_committee_member'),
+    path('v1/committee/members/search/<str:search_term>/', search_committee_members, name='search_committee_members'),
 ] 
