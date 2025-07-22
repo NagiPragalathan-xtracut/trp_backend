@@ -16,6 +16,12 @@ from base.models.faculty_model import (
 from base.models.commitee_model import (
     Committee, CommitteeCategory
 )
+from base.models.forms_models import (
+    ContactForm, CareerForm, GrievanceForm
+)
+from base.models.achivements_model import (
+    CollegeAchievement, StudentAchievement
+)
 
 # ============================================================================
 # DEPARTMENT MODELS - INLINE CONFIGURATIONS
@@ -386,6 +392,133 @@ class FacultyBannerAdmin(admin.ModelAdmin):
     list_filter = ['faculty', 'created_at']
     search_fields = ['faculty__name', 'alt']
     list_select_related = ['faculty']
+
+# ============================================================================
+# FORMS ADMIN CONFIGURATIONS
+# ============================================================================
+
+@admin.register(ContactForm)
+class ContactFormAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'phone', 'is_mail_sent', 'created_at']
+    list_filter = ['is_mail_sent', 'created_at']
+    search_fields = ['name', 'email', 'phone', 'message']
+    readonly_fields = ['is_mail_sent', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+
+@admin.register(CareerForm)
+class CareerFormAdmin(admin.ModelAdmin):
+    list_display = ['name', 'email', 'current_opening', 'department', 'experience', 'created_at']
+    list_filter = ['department', 'gender', 'marital_status', 'created_at']
+    search_fields = ['name', 'email', 'phone', 'current_opening', 'qualification']
+    readonly_fields = ['created_at', 'updated_at']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Personal Information', {
+            'fields': ('name', 'email', 'phone', 'age', 'gender', 'date_of_birth', 'marital_status')
+        }),
+        ('Professional Information', {
+            'fields': ('current_opening', 'department', 'qualification', 'experience', 'resume')
+        }),
+        ('Additional Information', {
+            'fields': ('publishing_date', 'heard_from', 'languages_known')
+        }),
+        ('System Fields', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+@admin.register(GrievanceForm)
+class GrievanceFormAdmin(admin.ModelAdmin):
+    list_display = ['name', 'department', 'committee_category', 'faculty', 'status', 'reference_number', 'created_at']
+    list_filter = ['department', 'committee_category', 'faculty', 'status', 'created_at']
+    search_fields = ['name', 'email', 'phone', 'reference_number', 'details']
+    readonly_fields = ['reference_number', 'created_at', 'updated_at']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Personal Information', {
+            'fields': ('name', 'email', 'phone')
+        }),
+        ('Grievance Details', {
+            'fields': ('department', 'committee_category', 'faculty', 'details', 'status')
+        }),
+        ('System Fields', {
+            'fields': ('reference_number', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+# ============================================================================
+# ACHIEVEMENTS ADMIN CONFIGURATIONS
+# ============================================================================
+
+@admin.register(CollegeAchievement)
+class CollegeAchievementAdmin(admin.ModelAdmin):
+    list_display = ['department', 'course', 'date', 'image_preview', 'unique_id', 'created_at']
+    list_filter = ['department', 'course', 'date', 'created_at']
+    search_fields = ['description', 'department__name', 'course__name']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'image_preview']
+    ordering = ['-date', '-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('department', 'course', 'date')
+        }),
+        ('Media', {
+            'fields': ('image', 'image_preview', 'alt')
+        }),
+        ('Content', {
+            'fields': ('description', 'relevant_link')
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                obj.image.url
+            )
+        return "No Image"
+    image_preview.short_description = 'Image Preview'
+
+@admin.register(StudentAchievement)
+class StudentAchievementAdmin(admin.ModelAdmin):
+    list_display = ['department', 'course', 'date', 'image_preview', 'unique_id', 'created_at']
+    list_filter = ['department', 'course', 'date', 'created_at']
+    search_fields = ['description', 'department__name', 'course__name']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'image_preview']
+    ordering = ['-date', '-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('department', 'course', 'date')
+        }),
+        ('Media', {
+            'fields': ('image', 'image_preview', 'alt')
+        }),
+        ('Content', {
+            'fields': ('description', 'relevant_link')
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                obj.image.url
+            )
+        return "No Image"
+    image_preview.short_description = 'Image Preview'
 
 # ============================================================================
 # CUSTOM ADMIN SITE CONFIGURATION

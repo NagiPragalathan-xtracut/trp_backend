@@ -41,6 +41,27 @@ from base.views.commitee_views import (
     delete_committee_member,
     search_committee_members
 )
+from base.views.forms_view import (
+    submit_contact_form,
+    get_all_contact_forms,
+    submit_career_form,
+    get_all_career_forms,
+    submit_grievance_form,
+    get_all_grievances,
+    update_grievance_status
+)
+from base.views.achievement_views import (
+    create_college_achievement,
+    get_all_college_achievements,
+    get_college_achievement,
+    update_college_achievement,
+    delete_college_achievement,
+    create_student_achievement,
+    get_all_student_achievements,
+    get_student_achievement,
+    update_student_achievement,
+    delete_student_achievement
+)
 
 app_name = 'base'
 
@@ -86,4 +107,25 @@ urlpatterns = [
     path('v1/committee/members/<int:member_id>/update/', update_committee_member, name='update_committee_member'),
     path('v1/committee/members/<int:member_id>/delete/', delete_committee_member, name='delete_committee_member'),
     path('v1/committee/members/search/<str:search_term>/', search_committee_members, name='search_committee_members'),
+    
+    # Forms API v1 endpoints
+    path('v1/forms/contact/submit/', submit_contact_form, name='submit_contact_form'),
+    path('v1/forms/contact/', get_all_contact_forms, name='get_all_contact_forms'),
+    path('v1/forms/career/submit/', submit_career_form, name='submit_career_form'),
+    path('v1/forms/career/', get_all_career_forms, name='get_all_career_forms'),
+    path('v1/forms/grievance/submit/', submit_grievance_form, name='submit_grievance_form'),
+    path('v1/forms/grievance/', get_all_grievances, name='get_all_grievances'),
+    path('v1/forms/grievance/<int:grievance_id>/status/', update_grievance_status, name='update_grievance_status'),
+    
+    # Achievement API v1 endpoints
+    path('v1/achievements/college/', get_all_college_achievements, name='get_all_college_achievements'),
+    path('v1/achievements/college/create/', create_college_achievement, name='create_college_achievement'),
+    path('v1/achievements/college/<int:achievement_id>/', get_college_achievement, name='get_college_achievement'),
+    path('v1/achievements/college/<int:achievement_id>/update/', update_college_achievement, name='update_college_achievement'),
+    path('v1/achievements/college/<int:achievement_id>/delete/', delete_college_achievement, name='delete_college_achievement'),
+    path('v1/achievements/student/', get_all_student_achievements, name='get_all_student_achievements'),
+    path('v1/achievements/student/create/', create_student_achievement, name='create_student_achievement'),
+    path('v1/achievements/student/<int:achievement_id>/', get_student_achievement, name='get_student_achievement'),
+    path('v1/achievements/student/<int:achievement_id>/update/', update_student_achievement, name='update_student_achievement'),
+    path('v1/achievements/student/<int:achievement_id>/delete/', delete_student_achievement, name='delete_student_achievement'),
 ] 
