@@ -86,6 +86,23 @@ from base.views.news_events_views import (
     get_all_images,
     create_metadata
 )
+from base.views.placement_name_views import (
+    create_placement_name,
+    get_all_placement_names,
+    get_placement_name,
+    update_placement_name,
+    delete_placement_name,
+    create_placement_image,
+    get_all_placement_images,
+    get_placement_image,
+    update_placement_image,
+    delete_placement_image,
+    create_research_name,
+    get_all_research_names,
+    get_research_name,
+    update_research_name,
+    delete_research_name
+)
 
 app_name = 'base'
 
@@ -182,4 +199,25 @@ urlpatterns = [
     
     # Metadata API v1 endpoints
     path('v1/metadata/create/', create_metadata, name='create_metadata'),
+    
+    # Placement API v1 endpoints
+    path('v1/placements/', get_all_placement_names, name='get_all_placement_names'),
+    path('v1/placements/create/', create_placement_name, name='create_placement_name'),
+    path('v1/placements/<int:placement_id>/', get_placement_name, name='get_placement_name'),
+    path('v1/placements/<int:placement_id>/update/', update_placement_name, name='update_placement_name'),
+    path('v1/placements/<int:placement_id>/delete/', delete_placement_name, name='delete_placement_name'),
+    
+    # Placement Images API v1 endpoints
+    path('v1/placement-images/', get_all_placement_images, name='get_all_placement_images'),
+    path('v1/placement-images/create/', create_placement_image, name='create_placement_image'),
+    path('v1/placement-images/<int:image_id>/', get_placement_image, name='get_placement_image'),
+    path('v1/placement-images/<int:image_id>/update/', update_placement_image, name='update_placement_image'),
+    path('v1/placement-images/<int:image_id>/delete/', delete_placement_image, name='delete_placement_image'),
+    
+    # Research API v1 endpoints
+    path('v1/research/', get_all_research_names, name='get_all_research_names'),
+    path('v1/research/create/', create_research_name, name='create_research_name'),
+    path('v1/research/<int:research_id>/', get_research_name, name='get_research_name'),
+    path('v1/research/<int:research_id>/update/', update_research_name, name='update_research_name'),
+    path('v1/research/<int:research_id>/delete/', delete_research_name, name='delete_research_name'),
 ] 

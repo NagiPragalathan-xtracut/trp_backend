@@ -28,6 +28,9 @@ from base.models.carrer_model import (
 from base.models.news_events_models import (
     NewsEvents, MetaData, TagModel, ImageModel
 )
+from base.models.placement_name_model import (
+    PlacementName, PlacementImageModel, ResearchName
+)
 
 # ============================================================================
 # DEPARTMENT MODELS - INLINE CONFIGURATIONS
@@ -722,6 +725,100 @@ class NewsEventsAdmin(admin.ModelAdmin):
             tag_names.append(f"... +{obj.tags.count() - 3} more")
         return ", ".join(tag_names)
     tags_display.short_description = 'Tags'
+
+# ============================================================================
+# PLACEMENT & RESEARCH ADMIN CONFIGURATIONS
+# ============================================================================
+
+@admin.register(PlacementName)
+class PlacementNameAdmin(admin.ModelAdmin):
+    list_display = ['placement_name', 'placement_number', 'suffix', 'formatted_number_display', 'text_preview', 'unique_id', 'created_at']
+    list_filter = ['suffix', 'created_at']
+    search_fields = ['placement_name', 'placement_number', 'text']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'formatted_number_display']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('placement_name', 'placement_number', 'suffix')
+        }),
+        ('Description', {
+            'fields': ('text',)
+        }),
+        ('Display', {
+            'fields': ('formatted_number_display',)
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def formatted_number_display(self, obj):
+        return obj.get_formatted_number()
+    formatted_number_display.short_description = 'Formatted Number'
+    
+    def text_preview(self, obj):
+        return obj.text[:50] + "..." if len(obj.text) > 50 else obj.text
+    text_preview.short_description = 'Text Preview'
+
+@admin.register(PlacementImageModel)
+class PlacementImageModelAdmin(admin.ModelAdmin):
+    list_display = ['alt', 'image_preview', 'unique_id', 'created_at']
+    search_fields = ['alt']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'image_preview']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Image Information', {
+            'fields': ('image', 'image_preview', 'alt')
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html(
+                '<img src="{}" style="max-height: 50px;"/>',
+                obj.image.url
+            )
+        return "No Image"
+    image_preview.short_description = 'Image Preview'
+
+@admin.register(ResearchName)
+class ResearchNameAdmin(admin.ModelAdmin):
+    list_display = ['research_name', 'number', 'suffix', 'formatted_number_display', 'text_preview', 'unique_id', 'created_at']
+    list_filter = ['suffix', 'created_at']
+    search_fields = ['research_name', 'number', 'text']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'formatted_number_display']
+    ordering = ['-created_at']
+    
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('research_name', 'number', 'suffix')
+        }),
+        ('Description', {
+            'fields': ('text',)
+        }),
+        ('Display', {
+            'fields': ('formatted_number_display',)
+        }),
+        ('System Fields', {
+            'fields': ('unique_id', 'created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def formatted_number_display(self, obj):
+        return obj.get_formatted_number()
+    formatted_number_display.short_description = 'Formatted Number'
+    
+    def text_preview(self, obj):
+        return obj.text[:50] + "..." if len(obj.text) > 50 else obj.text
+    text_preview.short_description = 'Text Preview'
 
 # ============================================================================
 # CUSTOM ADMIN SITE CONFIGURATION
