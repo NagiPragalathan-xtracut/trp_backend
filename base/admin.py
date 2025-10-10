@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from base.models.department_model import (
     Department, AboutDepartment, NumberData, QuickLink,
     ProgramOffered, Curriculum, Benefit, DepartmentContact,
-    CTA, POPSOPEO, Facility, Banner
+    CTA, POPSOPEO, Facility, Banner, DepartmentStatistics
 )
 from base.models.course_model import (
     Course, AboutTheCourseModel, NumberDataATD, QuickLinksModel,
@@ -47,6 +47,11 @@ class AboutDepartmentInline(admin.StackedInline):
 class QuickLinkInline(admin.TabularInline):
     model = QuickLink
     extra = 1
+class DepartmentStatisticsInline(admin.TabularInline):
+    model = DepartmentStatistics
+    extra = 1
+    fields = ['name', 'number', 'suffix', 'description', 'featured', 'display_order']
+    ordering = ['display_order']
 
 class ProgramOfferedInline(admin.StackedInline):
     model = ProgramOffered
@@ -75,6 +80,7 @@ class POPSOPEOInline(admin.StackedInline):
 class FacilityInline(admin.StackedInline):
     model = Facility
     extra = 1
+
 
 class BannerInline(admin.StackedInline):
     model = Banner
@@ -160,14 +166,20 @@ class CommitteeAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'has_ug', 'has_pg', 'has_phd']
+    list_display = ['name', 'has_ug', 'has_pg', 'has_phd', 'stats_count']
     list_filter = ['ug', 'pg', 'phd']
     search_fields = ['name']
+
+    def stats_count(self, obj):
+        return obj.statistics.count()
+    stats_count.short_description = 'Stats Count'
+
     
     inlines = [
         BannerInline,
         AboutDepartmentInline,
         QuickLinkInline,
+        DepartmentStatisticsInline,
         ProgramOfferedInline,
         CurriculumInline,
         BenefitInline,
@@ -189,73 +201,73 @@ class DepartmentAdmin(admin.ModelAdmin):
         return '✓' if obj.phd else '✗'
     has_phd.short_description = 'PhD'
 
-# Department Related Models
-@admin.register(AboutDepartment)
-class AboutDepartmentAdmin(admin.ModelAdmin):
-    list_display = ['department', 'heading']
-    list_filter = ['department']
-    search_fields = ['heading', 'department__name']
-    inlines = [NumberDataInline]
+# # Department Related Models
+# @admin.register(AboutDepartment)
+# class AboutDepartmentAdmin(admin.ModelAdmin):
+#     list_display = ['department', 'heading']
+#     list_filter = ['department']
+#     search_fields = ['heading', 'department__name']
+#     inlines = [NumberDataInline]
 
-@admin.register(NumberData)
-class NumberDataAdmin(admin.ModelAdmin):
-    list_display = ['text', 'number', 'symbol', 'featured']
-    list_filter = ['featured']
-    search_fields = ['text', 'number']
+# @admin.register(NumberData)
+# class NumberDataAdmin(admin.ModelAdmin):
+#     list_display = ['text', 'number', 'symbol', 'featured']
+#     list_filter = ['featured']
+#     search_fields = ['text', 'number']
 
-@admin.register(QuickLink)
-class QuickLinkAdmin(admin.ModelAdmin):
-    list_display = ['name', 'link', 'department']
-    list_filter = ['department']
-    search_fields = ['name']
+# @admin.register(QuickLink)
+# class QuickLinkAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'link', 'department']
+#     list_filter = ['department']
+#     search_fields = ['name']
 
-@admin.register(ProgramOffered)
-class ProgramOfferedAdmin(admin.ModelAdmin):
-    list_display = ['name', 'department']
-    list_filter = ['department']
-    search_fields = ['name']
+# @admin.register(ProgramOffered)
+# class ProgramOfferedAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'department']
+#     list_filter = ['department']
+#     search_fields = ['name']
 
-@admin.register(Curriculum)
-class CurriculumAdmin(admin.ModelAdmin):
-    list_display = ['name', 'department']
-    list_filter = ['department']
-    search_fields = ['name']
+# @admin.register(Curriculum)
+# class CurriculumAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'department']
+#     list_filter = ['department']
+#     search_fields = ['name']
 
-@admin.register(Benefit)
-class BenefitAdmin(admin.ModelAdmin):
-    list_display = ['text', 'department']
-    list_filter = ['department']
-    search_fields = ['text']
+# @admin.register(Benefit)
+# class BenefitAdmin(admin.ModelAdmin):
+#     list_display = ['text', 'department']
+#     list_filter = ['department']
+#     search_fields = ['text']
 
-@admin.register(DepartmentContact)
-class DepartmentContactAdmin(admin.ModelAdmin):
-    list_display = ['name', 'position', 'email', 'phone', 'department']
-    list_filter = ['department', 'position']
-    search_fields = ['name', 'email', 'phone']
+# @admin.register(DepartmentContact)
+# class DepartmentContactAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'position', 'email', 'phone', 'department']
+#     list_filter = ['department', 'position']
+#     search_fields = ['name', 'email', 'phone']
 
-@admin.register(CTA)
-class CTAAdmin(admin.ModelAdmin):
-    list_display = ['heading', 'link', 'department']
-    list_filter = ['department']
-    search_fields = ['heading']
+# @admin.register(CTA)
+# class CTAAdmin(admin.ModelAdmin):
+#     list_display = ['heading', 'link', 'department']
+#     list_filter = ['department']
+#     search_fields = ['heading']
 
-@admin.register(POPSOPEO)
-class POPSOPEOAdmin(admin.ModelAdmin):
-    list_display = ['name', 'department']
-    list_filter = ['department']
-    search_fields = ['name']
+# @admin.register(POPSOPEO)
+# class POPSOPEOAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'department']
+#     list_filter = ['department']
+#     search_fields = ['name']
 
-@admin.register(Facility)
-class FacilityAdmin(admin.ModelAdmin):
-    list_display = ['heading', 'department']
-    list_filter = ['department']
-    search_fields = ['heading']
+# @admin.register(Facility)
+# class FacilityAdmin(admin.ModelAdmin):
+#     list_display = ['heading', 'department']
+#     list_filter = ['department']
+#     search_fields = ['heading']
 
-@admin.register(Banner)
-class BannerAdmin(admin.ModelAdmin):
-    list_display = ['department', 'alt']
-    list_filter = ['department']
-    search_fields = ['alt']
+# @admin.register(Banner)
+# class BannerAdmin(admin.ModelAdmin):
+#     list_display = ['department', 'alt']
+#     list_filter = ['department']
+#     search_fields = ['alt']
 
 # ============================================================================
 # COURSE ADMIN CONFIGURATIONS
@@ -292,67 +304,67 @@ class CourseAdmin(admin.ModelAdmin):
     has_phd.short_description = 'PhD'
 
 # Course Related Models
-@admin.register(AboutTheCourseModel)
-class AboutTheCourseModelAdmin(admin.ModelAdmin):
-    list_display = ['course', 'heading', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['heading', 'course__name']
-    inlines = [NumberDataATDInline]
+# @admin.register(AboutTheCourseModel)
+# class AboutTheCourseModelAdmin(admin.ModelAdmin):
+#     list_display = ['course', 'heading', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['heading', 'course__name']
+#     inlines = [NumberDataATDInline]
 
-@admin.register(NumberDataATD)
-class NumberDataATDAdmin(admin.ModelAdmin):
-    list_display = ['text', 'number', 'symbol', 'featured', 'unique_id']
-    list_filter = ['featured', 'symbol']
-    search_fields = ['text', 'number']
-    readonly_fields = ['unique_id']
+# @admin.register(NumberDataATD)
+# class NumberDataATDAdmin(admin.ModelAdmin):
+#     list_display = ['text', 'number', 'symbol', 'featured', 'unique_id']
+#     list_filter = ['featured', 'symbol']
+#     search_fields = ['text', 'number']
+#     readonly_fields = ['unique_id']
 
-@admin.register(QuickLinksModel)
-class QuickLinksModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'link', 'course', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['name', 'course__name']
+# @admin.register(QuickLinksModel)
+# class QuickLinksModelAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'link', 'course', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['name', 'course__name']
 
-@admin.register(SubjectsModel)
-class SubjectsModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'course', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['name', 'course__name']
+# @admin.register(SubjectsModel)
+# class SubjectsModelAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'course', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['name', 'course__name']
 
-@admin.register(LabModel)
-class LabModelAdmin(admin.ModelAdmin):
-    list_display = ['heading', 'course', 'link_blank', 'created_at']
-    list_filter = ['course', 'link_blank', 'created_at']
-    search_fields = ['heading', 'course__name']
+# @admin.register(LabModel)
+# class LabModelAdmin(admin.ModelAdmin):
+#     list_display = ['heading', 'course', 'link_blank', 'created_at']
+#     list_filter = ['course', 'link_blank', 'created_at']
+#     search_fields = ['heading', 'course__name']
 
-@admin.register(CurriculumModel)
-class CurriculumModelAdmin(admin.ModelAdmin):
-    list_display = ['name', 'course', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['name', 'course__name']
+# @admin.register(CurriculumModel)
+# class CurriculumModelAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'course', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['name', 'course__name']
 
-@admin.register(BenefitsModel)
-class BenefitsModelAdmin(admin.ModelAdmin):
-    list_display = ['text', 'course', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['text', 'course__name']
+# @admin.register(BenefitsModel)
+# class BenefitsModelAdmin(admin.ModelAdmin):
+#     list_display = ['text', 'course', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['text', 'course__name']
 
-@admin.register(CourseContact)
-class CourseContactAdmin(admin.ModelAdmin):
-    list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
-    list_filter = ['course', 'position', 'created_at']
-    search_fields = ['name', 'mail', 'phone', 'course__name']
+# @admin.register(CourseContact)
+# class CourseContactAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
+#     list_filter = ['course', 'position', 'created_at']
+#     search_fields = ['name', 'mail', 'phone', 'course__name']
 
-@admin.register(CTAModel)
-class CTAModelAdmin(admin.ModelAdmin):
-    list_display = ['heading', 'link', 'course', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['heading', 'course__name']
+# @admin.register(CTAModel)
+# class CTAModelAdmin(admin.ModelAdmin):
+#     list_display = ['heading', 'link', 'course', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['heading', 'course__name']
 
-@admin.register(CourseBanner)
-class CourseBannerAdmin(admin.ModelAdmin):
-    list_display = ['course', 'alt', 'created_at']
-    list_filter = ['course', 'created_at']
-    search_fields = ['alt', 'course__name']
+# @admin.register(CourseBanner)
+# class CourseBannerAdmin(admin.ModelAdmin):
+#     list_display = ['course', 'alt', 'created_at']
+#     list_filter = ['course', 'created_at']
+#     search_fields = ['alt', 'course__name']
 
 # ============================================================================
 # FACULTY ADMIN CONFIGURATIONS
@@ -395,12 +407,12 @@ class FacultyAdmin(admin.ModelAdmin):
         }),
     )
 
-@admin.register(FacultyBanner)
-class FacultyBannerAdmin(admin.ModelAdmin):
-    list_display = ['faculty', 'alt', 'created_at']
-    list_filter = ['faculty', 'created_at']
-    search_fields = ['faculty__name', 'alt']
-    list_select_related = ['faculty']
+# @admin.register(FacultyBanner)
+# class FacultyBannerAdmin(admin.ModelAdmin):
+#     list_display = ['faculty', 'alt', 'created_at']
+#     list_filter = ['faculty', 'created_at']
+#     search_fields = ['faculty__name', 'alt']
+#     list_select_related = ['faculty']
 
 # ============================================================================
 # FORMS ADMIN CONFIGURATIONS
@@ -820,11 +832,12 @@ class ResearchNameAdmin(admin.ModelAdmin):
         return obj.text[:50] + "..." if len(obj.text) > 50 else obj.text
     text_preview.short_description = 'Text Preview'
 
+
 # ============================================================================
 # CUSTOM ADMIN SITE CONFIGURATION
 # ============================================================================
 
 # Customize admin site appearance
-admin.site.site_header = "IITM Backend Administration"
-admin.site.site_title = "IITM Admin Portal"
-admin.site.index_title = "Welcome to IITM Backend Administration"
+admin.site.site_header = "TRP Backend Administration"
+admin.site.site_title = "TRP Admin Portal"
+admin.site.index_title = "Welcome to TRP Backend Administration"

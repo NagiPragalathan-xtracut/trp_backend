@@ -1,13 +1,16 @@
 from django.db import models
 from ckeditor.fields import RichTextField
+from base.models.department_model import Department
 import uuid
 
 
 class Course(models.Model):
     name = models.CharField(max_length=255)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
     ug = models.BooleanField(default=False, help_text="Undergraduate program available")
-    pg = models.BooleanField(default=False, help_text="Postgraduate program available") 
+    pg = models.BooleanField(default=False, help_text="Postgraduate program available")
     phd = models.BooleanField(default=False, help_text="PhD program available")
+
     about_the_course = models.TextField(blank=True, null=True)
     vision = RichTextField(blank=True, null=True)
     mission = RichTextField(blank=True, null=True)

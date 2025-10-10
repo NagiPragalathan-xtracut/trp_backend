@@ -8,7 +8,7 @@ class Department(models.Model):
     phd = models.BooleanField(default=False)
     vision = RichTextField()
     mission = RichTextField()
-    
+
     def __str__(self):
         return self.name
 
@@ -114,6 +114,25 @@ class Banner(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='banners')
     image = models.ImageField(upload_to='department/banners/')
     alt = models.CharField(max_length=200)
-    
+
     def __str__(self):
-        return f"{self.department.name} - Banner" 
+        return f"{self.department.name} - Banner"
+
+
+class DepartmentStatistics(models.Model):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='statistics')
+    name = models.CharField(max_length=255, help_text="Name of the statistical data (e.g., 'Students Enrolled')")
+    number = models.IntegerField(help_text="Numeric value for the statistic")
+    suffix = models.CharField(max_length=50, blank=True, null=True, help_text="Suffix text (e.g., '+', '%', 'years')")
+    description = models.TextField(blank=True, null=True, help_text="Description or context for the statistic")
+    featured = models.BooleanField(default=False, help_text="Mark as featured for display in other sections")
+    display_order = models.PositiveIntegerField(default=0, help_text="Order for displaying statistics")
+
+    def __str__(self):
+        suffix_text = f" {self.suffix}" if self.suffix else ""
+        return f"{self.department.name} - {self.name}: {self.number}{suffix_text}"
+
+    class Meta:
+        ordering = ['display_order', 'id']
+        verbose_name = "Department Statistic"
+        verbose_name_plural = "Department Statistics" 

@@ -9,6 +9,7 @@ from base.models.course_model import (
     SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
     CourseContact, CTAModel, CourseBanner
 )
+from base.models.department_model import Department
 
 
 def course_to_dto(course):
@@ -16,6 +17,10 @@ def course_to_dto(course):
     return {
         'id': course.id,
         'name': course.name,
+        'department': {
+            'id': course.department.id,
+            'name': course.department.name
+        } if course.department else None,
         'ug': course.ug,
         'pg': course.pg,
         'phd': course.phd,
@@ -248,6 +253,74 @@ def get_course_by_name(request, course_name):
     }
     
     return Response(course_dto, status=status.HTTP_200_OK)
+
+
+# ============================================================================
+# DEPARTMENT-COURSE RELATIONSHIP ENDPOINTS
+# ============================================================================
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all courses for a specific department",
+    operation_id="get_courses_by_department",
+    responses={
+        200: openapi.Response(description="List of courses for the department"),
+        404: openapi.Response(description="Department not found")
+    }
+)
+@api_view(['GET'])
+def get_courses_by_department(request, department_id):
+    """Get all courses for a specific department"""
+    try:
+        department = Department.objects.get(id=department_id)
+    except Department.DoesNotExist:
+        return Response({"error": "Department not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    courses = Course.objects.filter(department=department)
+    course_dtos = [course_to_dto(course) for course in courses]
+
+    return Response({
+        'department': {
+            'id': department.id,
+            'name': department.name
+        },
+        'courses': course_dtos,
+        'total_courses': len(course_dtos)
+    }, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get department details for a specific course",
+    operation_id="get_course_department",
+    responses={
+        200: openapi.Response(description="Department details for the course"),
+        404: openapi.Response(description="Course not found")
+    }
+)
+@api_view(['GET'])
+def get_course_department(request, course_id):
+    """Get department details for a specific course"""
+    try:
+        course = Course.objects.select_related('department').get(id=course_id)
+    except Course.DoesNotExist:
+        return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        'course': {
+            'id': course.id,
+            'name': course.name
+        },
+        'department': {
+            'id': course.department.id,
+            'name': course.department.name,
+            'ug': course.department.ug,
+            'pg': course.department.pg,
+            'phd': course.department.phd,
+            'vision': course.department.vision,
+            'mission': course.department.mission
+        }
+    }, status=status.HTTP_200_OK)
 
 
 @swagger_auto_schema(
@@ -535,4 +608,94 @@ def get_course_detail(request, course_id):
         'banners': [banner_to_dto(banner) for banner in course.banners.all()],
     }
     
-    return Response(course_dto, status=status.HTTP_200_OK) 
+    return Response(course_dto, status=status.HTTP_200_OK)
+
+
+# ============================================================================
+# DEPARTMENT-COURSE RELATIONSHIP ENDPOINTS
+# ============================================================================
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all courses for a specific department",
+    operation_id="get_courses_by_department",
+    responses={
+        200: openapi.Response(description="List of courses for the department"),
+        404: openapi.Response(description="Department not found")
+    }
+)
+@api_view(['GET'])
+def get_courses_by_department(request, department_id):
+    """Get all courses for a specific department"""
+    try:
+        department = Department.objects.get(id=department_id)
+    except Department.DoesNotExist:
+        return Response({"error": "Department not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    courses = Course.objects.filter(department=department)
+    course_dtos = [course_to_dto(course) for course in courses]
+
+    return Response({
+        'department': {
+            'id': department.id,
+            'name': department.name
+        },
+        'courses': course_dtos,
+        'total_courses': len(course_dtos)
+    }, status=status.HTTP_200_OK)
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get department details for a specific course",
+    operation_id="get_course_department",
+    responses={
+        200: openapi.Response(description="Department details for the course"),
+        404: openapi.Response(description="Course not found")
+    }
+)
+@api_view(['GET'])
+def get_course_department(request, course_id):
+    """Get department details for a specific course"""
+    try:
+        course = Course.objects.select_related('department').get(id=course_id)
+    except Course.DoesNotExist:
+        return Response({"error": "Course not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    return Response({
+        'course': {
+            'id': course.id,
+            'name': course.name
+        },
+        'department': {
+            'id': course.department.id,
+            'name': course.department.name,
+            'ug': course.department.ug,
+            'pg': course.department.pg,
+            'phd': course.department.phd,
+            'vision': course.department.vision,
+            'mission': course.department.mission
+        }
+    }, status=status.HTTP_200_OK) 
+
+
+@swagger_auto_schema(
+    method='get',
+    operation_description="Get all courses that don't have a department assigned",
+    operation_id="get_courses_without_department",
+    responses={
+        200: openapi.Response(description="List of courses without department assignment")
+    }
+)
+@api_view(['GET'])
+def get_courses_without_department(request):
+    """Get all courses that don't have a department assigned"""
+    courses = Course.objects.filter(department__isnull=True)
+    course_dtos = [course_to_dto(course) for course in courses]
+
+    return Response({
+        'courses': course_dtos,
+        'total_courses': len(course_dtos)
+    }, status=status.HTTP_200_OK)
+
+

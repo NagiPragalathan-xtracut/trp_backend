@@ -3,7 +3,10 @@ from base.views.document_view import (
     get_department_detail,
     get_all_departments,
     get_department_programs,
-    get_department_facilities
+    get_department_facilities,
+    get_department_statistics,
+    create_department_statistic,
+    get_all_featured_statistics
 )
 from base.views.course_view import (
     get_all_courses,
@@ -16,7 +19,10 @@ from base.views.course_view import (
     get_course_curriculum,
     get_course_benefits,
     get_course_contacts,
-    get_featured_number_data
+    get_featured_number_data,
+    get_courses_by_department,
+    get_course_department,
+    get_courses_without_department
 )
 from base.views.faculty_views import (
     get_all_designations,
@@ -112,6 +118,9 @@ urlpatterns = [
     path('v1/departments/<int:department_id>/', get_department_detail, name='department_detail'),
     path('v1/departments/<int:department_id>/programs/', get_department_programs, name='department_programs'),
     path('v1/departments/<int:department_id>/facilities/', get_department_facilities, name='department_facilities'),
+    path('v1/departments/<int:department_id>/statistics/', get_department_statistics, name='get_department_statistics'),
+    path('v1/departments/<int:department_id>/statistics/create/', create_department_statistic, name='create_department_statistic'),
+    path('v1/departments/featured-statistics/', get_all_featured_statistics, name='get_all_featured_statistics'),
     
     # Course API v1 endpoints
     path('v1/courses/', get_all_courses, name='courses_list'),
@@ -125,6 +134,11 @@ urlpatterns = [
     path('v1/courses/<int:course_id>/benefits/', get_course_benefits, name='course_benefits'),
     path('v1/courses/<int:course_id>/contacts/', get_course_contacts, name='course_contacts'),
     path('v1/featured-data/', get_featured_number_data, name='featured_number_data'),
+
+    # Department-Course relationship endpoints
+    path('v1/departments/<int:department_id>/courses/', get_courses_by_department, name='courses_by_department'),
+    path('v1/courses/<int:course_id>/department/', get_course_department, name='course_department'),
+    path('v1/courses/without-department/', get_courses_without_department, name='courses_without_department'),
     
     # Faculty API v1 endpoints
     path('v1/designations/', get_all_designations, name='designations_list'),
