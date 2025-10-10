@@ -8,9 +8,15 @@ class Department(models.Model):
     phd = models.BooleanField(default=False)
     vision = RichTextField()
     mission = RichTextField()
+    programs_image = models.ImageField(upload_to='department/programs/', blank=True, null=True, help_text="Default image for all programs in this department")
+    facilities_overview = RichTextField(blank=True, null=True, help_text="Overview/description for all facilities in this department")
 
     def __str__(self):
         return self.name
+
+    def get_ordered_programs(self):
+        """Get programs ordered by display_order"""
+        return self.programs.order_by('display_order', 'id')
 
 class AboutDepartment(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='about_sections')
@@ -43,14 +49,19 @@ class QuickLink(models.Model):
 
 class ProgramOffered(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='programs')
-    image = models.ImageField(upload_to='department/programs/')
     name = models.CharField(max_length=200)
     description = RichTextField()
     explore_link = models.URLField()
     apply_link = models.URLField()
-    
+    display_order = models.PositiveIntegerField(default=0, help_text="Order for displaying programs (0 = first)")
+
     def __str__(self):
-        return f"{self.department.name} - {self.name}"
+        return f"Program offered: #{self.display_order + 1} - {self.name}"
+
+    class Meta:
+        ordering = ['display_order', 'id']
+        verbose_name = "Program Offered"
+        verbose_name_plural = "Programs Offered"
 
 class Curriculum(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='curriculum')

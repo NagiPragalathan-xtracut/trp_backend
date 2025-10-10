@@ -84,13 +84,15 @@ def get_department_detail(request, department_id):
         for link in quick_links
     ]
     
-    # Get programs
-    programs = ProgramOffered.objects.filter(department=department)
+    # Get programs (ordered by display_order)
+    programs = department.get_ordered_programs()
     programs_data = [
         {
+            'id': prog.id,
             'name': prog.name,
+            'display_order': prog.display_order,
             'description': prog.description,
-            'image': prog.image.url if prog.image else None,
+            'image': department.programs_image.url if department.programs_image else None,
             'explore_link': prog.explore_link,
             'apply_link': prog.apply_link
         }
@@ -196,6 +198,8 @@ def get_department_detail(request, department_id):
         'phd': department.phd,
         'vision': department.vision,
         'mission': department.mission,
+        'programs_image': department.programs_image.url if department.programs_image else None,
+        'facilities_overview': department.facilities_overview,
         'about_sections': about_data,
         'quick_links': quick_links_data,
         'programs': programs_data,
@@ -244,7 +248,9 @@ def get_all_departments(request):
             'name': dept.name,
             'ug': dept.ug,
             'pg': dept.pg,
-            'phd': dept.phd
+            'phd': dept.phd,
+            'programs_image': dept.programs_image.url if dept.programs_image else None,
+            'facilities_overview': dept.facilities_overview
         }
         for dept in departments
     ]
@@ -288,13 +294,15 @@ def get_all_departments(request):
 def get_department_programs(request, department_id):
     """Get all programs for a specific department"""
     department = get_object_or_404(Department, id=department_id)
-    programs = ProgramOffered.objects.filter(department=department)
-    
+    programs = department.get_ordered_programs()
+
     programs_data = [
         {
+            'id': prog.id,
             'name': prog.name,
+            'display_order': prog.display_order,
             'description': prog.description,
-            'image': prog.image.url if prog.image else None,
+            'image': department.programs_image.url if department.programs_image else None,
             'explore_link': prog.explore_link,
             'apply_link': prog.apply_link
         }

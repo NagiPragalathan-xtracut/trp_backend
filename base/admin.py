@@ -55,7 +55,13 @@ class DepartmentStatisticsInline(admin.TabularInline):
 
 class ProgramOfferedInline(admin.StackedInline):
     model = ProgramOffered
-    extra = 1
+    extra = 2  # Show 2 empty forms for adding new programs
+    fields = ['name', 'display_order', 'description', 'explore_link', 'apply_link']
+    readonly_fields = []
+    ordering = ['display_order']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).order_by('display_order')
 
 class CurriculumInline(admin.StackedInline):
     model = Curriculum
@@ -166,13 +172,21 @@ class CommitteeAdmin(admin.ModelAdmin):
 
 @admin.register(Department)
 class DepartmentAdmin(admin.ModelAdmin):
-    list_display = ['name', 'has_ug', 'has_pg', 'has_phd', 'stats_count']
+    list_display = ['name', 'has_ug', 'has_pg', 'has_phd', 'stats_count', 'has_programs_image', 'has_facilities_overview']
     list_filter = ['ug', 'pg', 'phd']
     search_fields = ['name']
 
     def stats_count(self, obj):
         return obj.statistics.count()
     stats_count.short_description = 'Stats Count'
+
+    def has_programs_image(self, obj):
+        return '✓' if obj.programs_image else '✗'
+    has_programs_image.short_description = 'Programs Image'
+
+    def has_facilities_overview(self, obj):
+        return '✓' if obj.facilities_overview else '✗'
+    has_facilities_overview.short_description = 'Facilities Overview'
 
     
     inlines = [
@@ -840,4 +854,4 @@ class ResearchNameAdmin(admin.ModelAdmin):
 # Customize admin site appearance
 admin.site.site_header = "TRP Backend Administration"
 admin.site.site_title = "TRP Admin Portal"
-admin.site.index_title = "Welcome to TRP Backend Administration"
+admin.site.index_title = "Welcome to TRP Backend Administration"                                                                                                                                                                    
