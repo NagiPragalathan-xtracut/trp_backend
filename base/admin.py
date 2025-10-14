@@ -23,7 +23,7 @@ from base.models.achivements_model import (
     CollegeAchievement, StudentAchievement
 )
 from base.models.carrer_model import (
-    CareerOpening, CareerSuccess
+    CareerOpening, CareerSuccess, Company
 )
 from base.models.news_events_models import (
     NewsEvents, MetaData, TagModel, ImageModel
@@ -56,12 +56,42 @@ class DepartmentStatisticsInline(admin.TabularInline):
 class ProgramOfferedInline(admin.StackedInline):
     model = ProgramOffered
     extra = 2  # Show 2 empty forms for adding new programs
-    fields = ['name', 'display_order', 'description', 'explore_link', 'apply_link']
+    fields = ['name', 'course', 'display_order', 'description', 'explore_link', 'apply_link']
     readonly_fields = []
     ordering = ['display_order']
 
     def get_queryset(self, request):
-        return super().get_queryset(request).order_by('display_order')
+        return super().get_queryset(request).select_related('course').order_by('display_order')
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == 'course':
+            # Get the current department from the parent object
+            if hasattr(request, '_obj_') and request._obj_:
+                department = request._obj_
+            else:
+                # For new objects, we need to get department from the form data
+                department_id = request.POST.get('department') if request.POST else None
+                if department_id:
+                    try:
+                        department = Department.objects.get(id=department_id)
+                    except Department.DoesNotExist:
+                        department = None
+                else:
+                    department = None
+
+            if department:
+                # Get courses already selected for this department
+                selected_courses = ProgramOffered.objects.filter(
+                    department=department
+                ).exclude(course__isnull=True).values_list('course_id', flat=True)
+
+                # Filter queryset to exclude already selected courses
+                kwargs['queryset'] = Course.objects.filter(department=department).exclude(id__in=selected_courses)
+            else:
+                # If no department, show all courses
+                kwargs['queryset'] = Course.objects.all()
+
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
 class CurriculumInline(admin.StackedInline):
     model = Curriculum
@@ -124,9 +154,6 @@ class BenefitsInline(admin.TabularInline):
     model = BenefitsModel
     extra = 1
 
-class CourseContactInline(admin.StackedInline):
-    model = CourseContact
-    extra = 1
 
 class CTACourseInline(admin.TabularInline):
     model = CTAModel
@@ -134,6 +161,10 @@ class CTACourseInline(admin.TabularInline):
 
 class CourseBannerInline(admin.StackedInline):
     model = CourseBanner
+    extra = 1
+
+class CourseContactInline(admin.StackedInline):
+    model = CourseContact
     extra = 1
 
 # ============================================================================
@@ -175,6 +206,7 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_display = ['name', 'has_ug', 'has_pg', 'has_phd', 'stats_count', 'has_programs_image', 'has_facilities_overview']
     list_filter = ['ug', 'pg', 'phd']
     search_fields = ['name']
+    readonly_fields = ['created_at', 'updated_at']
 
     def stats_count(self, obj):
         return obj.statistics.count()
@@ -188,19 +220,41 @@ class DepartmentAdmin(admin.ModelAdmin):
         return '✓' if obj.facilities_overview else '✗'
     has_facilities_overview.short_description = 'Facilities Overview'
 
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'ug', 'pg', 'phd', 'vision', 'mission')
+        }),
+        ('Media & Content', {
+            'fields': ('programs_image', 'facilities_overview')
+        }),
+        ('SEO & Meta Data', {
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
+                      'keywords', 'author', 'published_date', 'is_published', 'featured'),
+            'classes': ('collapse',)
+        }),
+        ('Statistics', {
+            'fields': ()
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
     
     inlines = [
         BannerInline,
-        AboutDepartmentInline,
         QuickLinkInline,
         DepartmentStatisticsInline,
+        AboutDepartmentInline,
         ProgramOfferedInline,
-        CurriculumInline,
-        BenefitInline,
-        DepartmentContactInline,
-        CTAInline,
         POPSOPEOInline,
+        DepartmentContactInline,
+        BenefitInline,
         FacilityInline,
+        CurriculumInline,
+        CTAInline,
     ]
     
     def has_ug(self, obj):
@@ -292,6 +346,23 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ['name', 'has_ug', 'has_pg', 'has_phd', 'created_at']
     list_filter = ['ug', 'pg', 'phd', 'created_at']
     search_fields = ['name']
+    readonly_fields = ['created_at', 'updated_at']
+
+    fieldsets = (
+        ('Basic Information', {
+            'fields': ('name', 'department', 'ug', 'pg', 'phd', 'vision', 'mission')
+        }),
+        ('SEO & Meta Data', {
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
+                      'keywords', 'author', 'published_date', 'is_published', 'featured'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
     
     inlines = [
         CourseBannerInline,
@@ -300,8 +371,8 @@ class CourseAdmin(admin.ModelAdmin):
         SubjectsInline,
         LabInline,
         CurriculumCourseInline,
-        BenefitsInline,
         CourseContactInline,
+        # BenefitsInline,
         CTACourseInline,
     ]
     
@@ -362,11 +433,11 @@ class CourseAdmin(admin.ModelAdmin):
 #     list_filter = ['course', 'created_at']
 #     search_fields = ['text', 'course__name']
 
-# @admin.register(CourseContact)
-# class CourseContactAdmin(admin.ModelAdmin):
-#     list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
-#     list_filter = ['course', 'position', 'created_at']
-#     search_fields = ['name', 'mail', 'phone', 'course__name']
+@admin.register(CourseContact)
+class CourseContactAdmin(admin.ModelAdmin):
+    list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
+    list_filter = ['course', 'position', 'created_at']
+    search_fields = ['name', 'mail', 'phone', 'course__name']
 
 # @admin.register(CTAModel)
 # class CTAModelAdmin(admin.ModelAdmin):
@@ -400,11 +471,12 @@ class FacultyAdmin(admin.ModelAdmin):
     list_filter = ['designation', 'department', 'created_at']
     search_fields = ['name', 'mail_id', 'designation__name', 'department__name']
     list_select_related = ['designation', 'department']
-    
+    readonly_fields = ['created_at', 'updated_at']
+
     inlines = [
         FacultyBannerInline,
     ]
-    
+
     fieldsets = (
         ('Basic Information', {
             'fields': ('name', 'alt', 'image', 'designation', 'department')
@@ -417,6 +489,16 @@ class FacultyAdmin(admin.ModelAdmin):
         }),
         ('Professional Information', {
             'fields': ('publication', 'awards', 'workshop', 'work_experience', 'projects'),
+            'classes': ('collapse',)
+        }),
+        ('SEO & Meta Data', {
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
+                      'keywords', 'author', 'published_date', 'is_published', 'featured'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
@@ -583,12 +665,29 @@ class CareerOpeningAdmin(admin.ModelAdmin):
         }),
     )
 
+@admin.register(Company)
+class CompanyAdmin(admin.ModelAdmin):
+    list_display = ['name', 'image_preview', 'website', 'created_at']
+    list_filter = ['created_at']
+    search_fields = ['name', 'description']
+    readonly_fields = ['created_at', 'updated_at', 'image_preview']
+    ordering = ['name']
+
+    def image_preview(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover;" />', obj.image.url)
+        return "-"
+    image_preview.short_description = 'Image Preview'
+
 @admin.register(CareerSuccess)
 class CareerSuccessAdmin(admin.ModelAdmin):
-    list_display = ['student_name', 'year_with_degree', 'department', 'batch', 'student_image_preview', 'company_image_preview', 'created_at']
-    list_filter = ['department', 'batch', 'created_at']
-    search_fields = ['student_name', 'year_with_degree', 'description', 'department__name', 'batch']
-    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'student_image_preview', 'company_image_preview']
+    list_display = ['student_name', 'year_with_degree', 'department', 'company', 'batch', 'student_image_preview', 'created_at']
+    list_filter = ['department', 'company', 'batch', 'created_at']
+    search_fields = ['student_name', 'year_with_degree', 'description', 'department__name', 'company__name', 'batch']
+    readonly_fields = ['unique_id', 'created_at', 'updated_at', 'student_image_preview']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('department', 'company')
     ordering = ['-created_at']
     
     fieldsets = (
@@ -598,8 +697,8 @@ class CareerSuccessAdmin(admin.ModelAdmin):
         ('Student Media', {
             'fields': ('image', 'student_image_preview', 'alt')
         }),
-        ('Company Media', {
-            'fields': ('company_image', 'company_image_preview')
+        ('Company Information', {
+            'fields': ('company',)
         }),
         ('Content', {
             'fields': ('description',)
@@ -709,7 +808,7 @@ class NewsEventsAdmin(admin.ModelAdmin):
     filter_horizontal = ['tags', 'images']
     date_hierarchy = 'date'
     ordering = ['-date', '-created_at']
-    
+
     fieldsets = (
         ('Basic Information', {
             'fields': ('heading', 'category', 'department', 'date')
@@ -721,10 +820,10 @@ class NewsEventsAdmin(admin.ModelAdmin):
             'fields': ('images', 'tags', 'primary_image_preview')
         }),
         ('SEO & Metadata', {
-            'fields': ('metadata',)
-        }),
-        ('Status', {
-            'fields': ('is_published', 'is_featured')
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
+                      'keywords', 'author', 'published_date', 'is_published', 'featured', 'metadata'),
+            'classes': ('collapse',)
         }),
         ('System Fields', {
             'fields': ('unique_id', 'created_at', 'updated_at'),

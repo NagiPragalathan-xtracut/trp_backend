@@ -1,10 +1,11 @@
 from django.db import models
+from django.utils import timezone
 from ckeditor.fields import RichTextField
-from base.models.department_model import Department
+from base.models.department_model import Department, SEOMixin
 import uuid
 
 
-class Course(models.Model):
+class Course(SEOMixin):
     name = models.CharField(max_length=255)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
     ug = models.BooleanField(default=False, help_text="Undergraduate program available")
@@ -14,11 +15,78 @@ class Course(models.Model):
     about_the_course = models.TextField(blank=True, null=True)
     vision = RichTextField(blank=True, null=True)
     mission = RichTextField(blank=True, null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Override timestamps for existing model
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
+
+    def generate_seo_data(self):
+        """Generate SEO data for course"""
+        if not self.meta_title:
+            self.meta_title = f"{self.name} - Course Information"
+
+        if not self.meta_description:
+            description_parts = []
+            if self.about_the_course:
+                description_parts.append(str(self.about_the_course)[:150])
+            if self.vision:
+                description_parts.append(str(self.vision)[:150])
+            if self.mission:
+                description_parts.append(str(self.mission)[:150])
+            self.meta_description = " | ".join(description_parts) if description_parts else f"Learn about {self.name} course"
+
+        if not self.canonical_url:
+            if self.id:
+                self.canonical_url = f"/courses/{self.id}/"
+            else:
+                self.canonical_url = "/courses/"
+
+        if not self.og_title:
+            self.og_title = f"{self.name} - Course"
+
+        if not self.og_description:
+            self.og_description = self.meta_description[:200] if self.meta_description else f"Learn about {self.name}"
+
+        if not self.twitter_title:
+            self.twitter_title = self.og_title[:70] if self.og_title else f"{self.name}"
+
+        if not self.twitter_description:
+            self.twitter_description = self.og_description[:200] if self.og_description else f"Learn about {self.name}"
+
+        if not self.keywords:
+            keywords = [self.name.lower()]
+            if self.ug:
+                keywords.append("undergraduate")
+            if self.pg:
+                keywords.append("postgraduate")
+            if self.phd:
+                keywords.append("phd")
+            if self.department:
+                keywords.append(self.department.name.lower())
+            self.keywords = ", ".join(keywords)
+
+        if not self.author:
+            self.author = "IITM Administration"
+
+        # Generate basic schema.org JSON-LD
+        if not self.schema_json:
+            schema = {
+                "@context": "https://schema.org",
+                "@type": "Course",
+                "name": self.name,
+                "description": self.meta_description[:500] if self.meta_description else f"Course at IITM",
+                "provider": {
+                    "@type": "EducationalOrganization",
+                    "name": "IITM"
+                },
+                "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else f"https://yourdomain.com/courses/{self.id}/"
+            }
+            if self.department:
+                schema["provider"]["name"] = self.department.name
+            self.schema_json = str(schema).replace("'", '"')
 
     class Meta:
         ordering = ['name']

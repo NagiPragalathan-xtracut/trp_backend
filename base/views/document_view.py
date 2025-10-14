@@ -90,6 +90,10 @@ def get_department_detail(request, department_id):
         {
             'id': prog.id,
             'name': prog.name,
+            'course': {
+                'id': prog.course.id if prog.course else None,
+                'name': prog.course.name if prog.course else None
+            } if prog.course else None,
             'display_order': prog.display_order,
             'description': prog.description,
             'image': department.programs_image.url if department.programs_image else None,
@@ -300,6 +304,10 @@ def get_department_programs(request, department_id):
         {
             'id': prog.id,
             'name': prog.name,
+            'course': {
+                'id': prog.course.id if prog.course else None,
+                'name': prog.course.name if prog.course else None
+            } if prog.course else None,
             'display_order': prog.display_order,
             'description': prog.description,
             'image': department.programs_image.url if department.programs_image else None,
