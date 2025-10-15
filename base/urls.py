@@ -3,7 +3,10 @@ from base.views.document_view import (
     get_department_detail,
     get_all_departments,
     get_department_programs,
-    get_department_facilities
+    get_department_facilities,
+    get_department_statistics,
+    create_department_statistic,
+    get_all_featured_statistics
 )
 from base.views.course_view import (
     get_all_courses,
@@ -16,7 +19,10 @@ from base.views.course_view import (
     get_course_curriculum,
     get_course_benefits,
     get_course_contacts,
-    get_featured_number_data
+    get_featured_number_data,
+    get_courses_by_department,
+    get_course_department,
+    get_courses_without_department
 )
 from base.views.faculty_views import (
     get_all_designations,
@@ -74,6 +80,14 @@ from base.views.carrer_views import (
     update_career_success,
     delete_career_success
 )
+from base.views.company_views import (
+    get_all_companies,
+    create_company,
+    get_company,
+    update_company,
+    delete_company,
+    search_companies
+)
 from base.views.news_events_views import (
     create_news_event,
     get_all_news_events,
@@ -103,7 +117,11 @@ from base.views.placement_name_views import (
     update_research_name,
     delete_research_name
 )
-
+from base.views.company_views import (
+    get_all_companies,
+    create_company,
+    get_company,
+)
 app_name = 'base'
 
 urlpatterns = [
@@ -112,6 +130,9 @@ urlpatterns = [
     path('v1/departments/<int:department_id>/', get_department_detail, name='department_detail'),
     path('v1/departments/<int:department_id>/programs/', get_department_programs, name='department_programs'),
     path('v1/departments/<int:department_id>/facilities/', get_department_facilities, name='department_facilities'),
+    path('v1/departments/<int:department_id>/statistics/', get_department_statistics, name='get_department_statistics'),
+    path('v1/departments/<int:department_id>/statistics/create/', create_department_statistic, name='create_department_statistic'),
+    path('v1/departments/featured-statistics/', get_all_featured_statistics, name='get_all_featured_statistics'),
     
     # Course API v1 endpoints
     path('v1/courses/', get_all_courses, name='courses_list'),
@@ -125,6 +146,19 @@ urlpatterns = [
     path('v1/courses/<int:course_id>/benefits/', get_course_benefits, name='course_benefits'),
     path('v1/courses/<int:course_id>/contacts/', get_course_contacts, name='course_contacts'),
     path('v1/featured-data/', get_featured_number_data, name='featured_number_data'),
+
+    # Department-Course relationship endpoints
+    path('v1/departments/<int:department_id>/courses/', get_courses_by_department, name='courses_by_department'),
+    path('v1/courses/<int:course_id>/department/', get_course_department, name='course_department'),
+    path('v1/courses/without-department/', get_courses_without_department, name='courses_without_department'),
+
+    # Company API v1 endpoints
+    path('v1/companies/', get_all_companies, name='companies_list'),
+    path('v1/companies/create/', create_company, name='create_company'),
+    path('v1/companies/<int:company_id>/', get_company, name='company_detail'),
+    path('v1/companies/<int:company_id>/update/', update_company, name='update_company'),
+    path('v1/companies/<int:company_id>/delete/', delete_company, name='delete_company'),
+    path('v1/companies/search/<str:search_term>/', search_companies, name='search_companies'),
     
     # Faculty API v1 endpoints
     path('v1/designations/', get_all_designations, name='designations_list'),
@@ -170,6 +204,7 @@ urlpatterns = [
     path('v1/achievements/student/<int:achievement_id>/update/', update_student_achievement, name='update_student_achievement'),
     path('v1/achievements/student/<int:achievement_id>/delete/', delete_student_achievement, name='delete_student_achievement'),
     
+   
     # Career API v1 endpoints
     path('v1/career/openings/', get_all_career_openings, name='get_all_career_openings'),
     path('v1/career/openings/create/', create_career_opening, name='create_career_opening'),

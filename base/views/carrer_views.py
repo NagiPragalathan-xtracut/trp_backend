@@ -5,7 +5,7 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db.models import Q
-from base.models.carrer_model import CareerOpening, CareerSuccess
+from base.models.carrer_model import CareerOpening, CareerSuccess, Company
 from base.models.department_model import Department
 
 
@@ -39,7 +39,13 @@ def career_success_to_dto(success):
         'image': success.image.url if success.image else None,
         'alt': success.alt,
         'description': success.description,
-        'company_image': success.company_image.url if success.company_image else None,
+        'company': {
+            'id': success.company.id if success.company else None,
+            'name': success.company.name if success.company else None,
+            'image': success.company.image.url if success.company and success.company.image else None,
+            'website': success.company.website if success.company else None,
+            'description': success.company.description if success.company else None
+        },
         'department': {
             'id': success.department.id,
             'name': success.department.name
@@ -292,8 +298,8 @@ def delete_career_opening(request, opening_id):
     operation_id="create_career_success",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['student_name', 'year_with_degree', 'image', 'alt', 
-                 'description', 'company_image', 'department_id', 'batch'],
+        required=['student_name', 'year_with_degree',  'alt', 
+                 'description',  'department_id', 'batch'],
         properties={
             'student_name': openapi.Schema(type=openapi.TYPE_STRING),
             'year_with_degree': openapi.Schema(type=openapi.TYPE_STRING),

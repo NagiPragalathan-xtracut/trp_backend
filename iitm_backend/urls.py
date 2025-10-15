@@ -25,12 +25,12 @@ from drf_yasg import openapi
 # Create schema view for Swagger UI
 schema_view = get_schema_view(
     openapi.Info(
-        title="IITM Department API",
+        title="TRP Department API",
         default_version='v1',
-        description="API for managing department information at IITM",
+        description="API for managing department information at TRP",
         terms_of_service="https://www.example.com/terms/",
-        contact=openapi.Contact(email="support@example.com"),
-        license=openapi.License(name="MIT License"),
+        contact=openapi.Contact(email="amul@xtracut.com"),
+        license=openapi.License(name="TRP License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),

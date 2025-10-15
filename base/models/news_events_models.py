@@ -1,6 +1,7 @@
 from django.db import models
+from django.utils import timezone
 from ckeditor.fields import RichTextField
-from base.models.department_model import Department
+from base.models.department_model import Department, SEOMixin
 import uuid
 
 class MetaData(models.Model):
@@ -61,7 +62,7 @@ class ImageModel(models.Model):
         verbose_name_plural = "Images"
 
 
-class NewsEvents(models.Model):
+class NewsEvents(SEOMixin):
     """Main news and events model"""
     CATEGORY_CHOICES = [
         ('news', 'News'),
@@ -77,21 +78,100 @@ class NewsEvents(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='news_events')
     content = RichTextField(help_text="Main content using CKEditor")
-    
+
     # Related models
     images = models.ManyToManyField(ImageModel, blank=True, related_name='news_events')
     metadata = models.OneToOneField(MetaData, on_delete=models.SET_NULL, null=True, blank=True, related_name='news_event')
     tags = models.ManyToManyField(TagModel, blank=True, related_name='news_events')
-    
+
     # System fields
     is_published = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False, help_text="Feature this news/event")
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+
+    # Override timestamps for existing model
+    created_at = models.DateTimeField(default=timezone.now)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.heading} - {self.get_category_display()}"
+
+    def generate_seo_data(self):
+        """Generate SEO data for news/events"""
+        if not self.meta_title:
+            self.meta_title = f"{self.heading} - {self.get_category_display()} | IITM"
+
+        if not self.meta_description:
+            # Extract first 160 characters from content
+            content_text = str(self.content).replace('<[^<]+?>', '')  # Remove HTML tags
+            self.meta_description = content_text[:160] if content_text else f"{self.heading} - {self.get_category_display()}"
+
+        if not self.canonical_url:
+            if self.id:
+                self.canonical_url = f"/news-events/{self.id}/"
+            else:
+                self.canonical_url = "/news-events/"
+
+        if not self.og_title:
+            self.og_title = f"{self.heading} - {self.get_category_display()}"
+
+        if not self.og_description:
+            self.og_description = self.meta_description[:200] if self.meta_description else f"{self.heading}"
+
+        # Use primary image for OG image
+        primary_image = self.get_primary_image()
+        if not self.og_image and primary_image:
+            self.og_image = primary_image.image.url
+
+        if not self.twitter_title:
+            self.twitter_title = self.og_title[:70] if self.og_title else f"{self.heading}"
+
+        if not self.twitter_description:
+            self.twitter_description = self.og_description[:200] if self.og_description else f"{self.heading}"
+
+        if not self.twitter_image:
+            self.twitter_image = self.og_image
+
+        if not self.keywords:
+            keywords = [self.heading.lower(), self.get_category_display().lower(), self.department.name.lower()]
+            if self.tags.exists():
+                keywords.extend([tag.tag_name.lower() for tag in self.tags.all()])
+            self.keywords = ", ".join(keywords)
+
+        if not self.author:
+            self.author = "IITM Administration"
+
+        # Generate schema.org JSON-LD for NewsArticle or Event
+        if not self.schema_json:
+            schema_type = "NewsArticle" if self.category == 'news' else "Event"
+            schema = {
+                "@context": "https://schema.org",
+                "@type": schema_type,
+                "headline": self.heading,
+                "description": self.meta_description[:500] if self.meta_description else f"{self.heading}",
+                "datePublished": self.date.isoformat() if self.date else None,
+                "dateModified": self.updated_at.isoformat() if self.updated_at else None,
+                "author": {
+                    "@type": "Organization",
+                    "name": "IITM"
+                },
+                "publisher": {
+                    "@type": "EducationalOrganization",
+                    "name": self.department.name if self.department else "IITM"
+                },
+                "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else f"https://yourdomain.com/news-events/{self.id}/"
+            }
+
+            if self.link:
+                schema["url"] = self.link
+
+            if primary_image:
+                schema["image"] = primary_image.image.url
+
+            if self.tags.exists():
+                schema["keywords"] = [tag.tag_name for tag in self.tags.all()]
+
+            self.schema_json = str(schema).replace("'", '"')
 
     class Meta:
         ordering = ['-date', '-created_at']
