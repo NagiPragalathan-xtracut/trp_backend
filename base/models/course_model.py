@@ -6,7 +6,7 @@ import uuid
 
 
 class Course(SEOMixin):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, blank=True, null=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
     ug = models.BooleanField(default=False, help_text="Undergraduate program available")
     pg = models.BooleanField(default=False, help_text="Postgraduate program available")
@@ -69,7 +69,7 @@ class Course(SEOMixin):
             self.keywords = ", ".join(keywords)
 
         if not self.author:
-            self.author = "IITM Administration"
+            self.author = "TRP Administration"
 
         # Generate basic schema.org JSON-LD
         if not self.schema_json:
@@ -77,10 +77,10 @@ class Course(SEOMixin):
                 "@context": "https://schema.org",
                 "@type": "Course",
                 "name": self.name,
-                "description": self.meta_description[:500] if self.meta_description else f"Course at IITM",
+                "description": self.meta_description[:500] if self.meta_description else f"Course at TRP",
                 "provider": {
                     "@type": "EducationalOrganization",
-                    "name": "IITM"
+                    "name": "TRP"
                 },
                 "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else f"https://yourdomain.com/courses/{self.id}/"
             }
@@ -94,8 +94,8 @@ class Course(SEOMixin):
 
 class AboutTheCourseModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='about_sections')
-    heading = models.CharField(max_length=255)
-    content = RichTextField()
+    heading = models.CharField(max_length=255, blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
     image = models.ImageField(upload_to='about_course/', blank=True, null=True)
     alt = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -112,9 +112,9 @@ class NumberDataATD(models.Model):
     ]
     
     about_section = models.ForeignKey(AboutTheCourseModel, on_delete=models.CASCADE, related_name='number_data')
-    number = models.IntegerField()
+    number = models.IntegerField(blank=True, null=True)
     symbol = models.CharField(max_length=1, choices=SYMBOL_CHOICES, blank=True, null=True)
-    text = models.CharField(max_length=255)
+    text = models.CharField(max_length=255, blank=True, null=True)
     featured = models.BooleanField(default=False)
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -128,8 +128,8 @@ class NumberDataATD(models.Model):
 
 class QuickLinksModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quick_links')
-    name = models.CharField(max_length=255)
-    link = models.URLField()
+    name = models.CharField(max_length=255, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -141,8 +141,8 @@ class QuickLinksModel(models.Model):
 
 class SubjectsModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='subjects')
-    name = models.CharField(max_length=255)
-    content = RichTextField()
+    name = models.CharField(max_length=255, blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -154,9 +154,9 @@ class SubjectsModel(models.Model):
 
 class LabModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='labs')
-    image = models.ImageField(upload_to='labs/')
-    heading = models.CharField(max_length=255)
-    description = models.TextField()
+    image = models.ImageField(upload_to='labs/', blank=True, null=True)
+    heading = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     alt = models.CharField(max_length=255, blank=True, null=True)
     link_blank = models.BooleanField(default=True, help_text="Open link in new tab")
     content = RichTextField(blank=True, null=True)
@@ -171,8 +171,8 @@ class LabModel(models.Model):
 
 class CurriculumModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='curriculum')
-    name = models.CharField(max_length=255)
-    description = models.TextField()
+    name = models.CharField(max_length=255, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     link_file = models.FileField(upload_to='curriculum_files/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -185,8 +185,8 @@ class CurriculumModel(models.Model):
 
 class BenefitsModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='benefits')
-    icon = models.ImageField(upload_to='benefits_icons/')
-    text = models.CharField(max_length=255)
+    icon = models.ImageField(upload_to='benefits_icons/', blank=True, null=True)
+    text = models.CharField(max_length=255, blank=True, null=True)
     benefit_image = models.ImageField(upload_to='benefits_images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -199,13 +199,13 @@ class BenefitsModel(models.Model):
 
 class CourseContact(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='contacts')
-    mail = models.EmailField()
-    phone = models.CharField(max_length=20)
-    name = models.CharField(max_length=255)
-    position = models.CharField(max_length=255)
+    mail = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    name = models.CharField(max_length=255, blank=True, null=True)
+    position = models.CharField(max_length=255, blank=True, null=True)
     image = models.ImageField(upload_to='contact_images/', blank=True, null=True)
     alt = models.CharField(max_length=255, blank=True, null=True)
-    heading = models.CharField(max_length=255)
+    heading = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -217,8 +217,8 @@ class CourseContact(models.Model):
 
 class CTAModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='cta_sections')
-    heading = models.CharField(max_length=255)
-    link = models.URLField()
+    heading = models.CharField(max_length=255, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -230,7 +230,7 @@ class CTAModel(models.Model):
 
 class CourseBanner(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='banners')
-    image = models.ImageField(upload_to='banners/')
+    image = models.ImageField(upload_to='banners/', blank=True, null=True)
     alt = models.CharField(max_length=255, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

@@ -53,12 +53,12 @@ class SEOMixin(models.Model):
 
 
 class Department(SEOMixin):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, blank=True, null=True)
     ug = models.BooleanField(default=False)
     pg = models.BooleanField(default=False)
     phd = models.BooleanField(default=False)
-    vision = RichTextField()
-    mission = RichTextField()
+    vision = RichTextField(blank=True, null=True)
+    mission = RichTextField(blank=True, null=True)
     programs_image = models.ImageField(upload_to='department/programs/', blank=True, null=True, help_text="Default image for all programs in this department")
     facilities_overview = RichTextField(blank=True, null=True, help_text="Overview/description for all facilities in this department")
 
@@ -132,29 +132,29 @@ class Department(SEOMixin):
 
 class AboutDepartment(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='about_sections')
-    heading = models.CharField(max_length=200)
-    content = RichTextField()
-    image = models.ImageField(upload_to='department/about/')
-    alt = models.CharField(max_length=200)
+    heading = models.CharField(max_length=200, blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
+    image = models.ImageField(upload_to='department/about/', blank=True, null=True)
+    alt = models.CharField(max_length=200, blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.heading}"
 
 class NumberData(models.Model):
     about_department = models.ForeignKey(AboutDepartment, on_delete=models.CASCADE, related_name='numbers')
-    number = models.CharField(max_length=50)
+    number = models.CharField(max_length=50, blank=True, null=True)
     symbol = models.CharField(max_length=10, null=True, blank=True)
-    text = models.CharField(max_length=200)
+    text = models.CharField(max_length=200, blank=True, null=True)
     featured = models.BooleanField(default=False)
-    unique_id = models.CharField(max_length=50, unique=True)
+    unique_id = models.CharField(max_length=50, unique=True, blank=True, null=True)
     
     def __str__(self):
         return f"{self.text}: {self.number}{self.symbol or ''}"
 
 class QuickLink(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='quick_links')
-    name = models.CharField(max_length=200)
-    link = models.URLField()
+    name = models.CharField(max_length=200, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
     
     def __str__(self):
         return self.name
@@ -162,10 +162,10 @@ class QuickLink(models.Model):
 class ProgramOffered(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='programs')
     course = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True, blank=True, related_name='program_offerings', help_text="Associated course (optional)")
-    name = models.CharField(max_length=200)
-    description = RichTextField()
-    explore_link = models.URLField()
-    apply_link = models.URLField()
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = RichTextField(blank=True, null=True)
+    explore_link = models.URLField(blank=True, null=True)
+    apply_link = models.URLField(blank=True, null=True)
     display_order = models.PositiveIntegerField(default=0, help_text="Order for displaying programs (0 = first)")
 
     def __str__(self):
@@ -179,56 +179,56 @@ class ProgramOffered(models.Model):
 
 class Curriculum(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='curriculum')
-    name = models.CharField(max_length=200)
-    description = models.TextField()
-    file = models.FileField(upload_to='department/curriculum/')
+    name = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    file = models.FileField(upload_to='department/curriculum/', blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.name}"
 
 class Benefit(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='benefits')
-    icon = models.ImageField(upload_to='department/benefits/')
-    text = models.TextField()
+    icon = models.ImageField(upload_to='department/benefits/', blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.text[:50]}"
 
 class DepartmentContact(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='contacts')
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    name = models.CharField(max_length=200)
-    position = models.CharField(max_length=200)
-    image = models.ImageField(upload_to='department/contacts/')
-    alt = models.CharField(max_length=200)
-    heading = models.CharField(max_length=200)
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    position = models.CharField(max_length=200, blank=True, null=True)
+    image = models.ImageField(upload_to='department/contacts/', blank=True, null=True)
+    alt = models.CharField(max_length=200, blank=True, null=True)
+    heading = models.CharField(max_length=200, blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.name}"
 
 class CTA(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='ctas')
-    heading = models.CharField(max_length=200)
-    link = models.URLField()
+    heading = models.CharField(max_length=200, blank=True, null=True)
+    link = models.URLField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.heading}"
 
 class POPSOPEO(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='po_pso_peo')
-    name = models.CharField(max_length=200)
-    content = RichTextField()
+    name = models.CharField(max_length=200, blank=True, null=True)
+    content = RichTextField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.name}"
 
 class Facility(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='facilities')
-    image = models.ImageField(upload_to='department/facilities/')
-    heading = models.CharField(max_length=200)
-    description = models.TextField()
-    alt = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='department/facilities/', blank=True, null=True)
+    heading = models.CharField(max_length=200, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    alt = models.CharField(max_length=200, blank=True, null=True)
     link_blank = models.BooleanField(default=False)
     content = RichTextField(blank=True, null=True)
     
@@ -237,8 +237,8 @@ class Facility(models.Model):
 
 class Banner(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='banners')
-    image = models.ImageField(upload_to='department/banners/')
-    alt = models.CharField(max_length=200)
+    image = models.ImageField(upload_to='department/banners/', blank=True, null=True)
+    alt = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
         return f"{self.department.name} - Banner"
@@ -246,8 +246,8 @@ class Banner(models.Model):
 
 class DepartmentStatistics(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='statistics')
-    name = models.CharField(max_length=255, help_text="Name of the statistical data (e.g., 'Students Enrolled')")
-    number = models.IntegerField(help_text="Numeric value for the statistic")
+    name = models.CharField(max_length=255, blank=True, null=True, help_text="Name of the statistical data (e.g., 'Students Enrolled')")
+    number = models.IntegerField(blank=True, null=True, help_text="Numeric value for the statistic")
     suffix = models.CharField(max_length=50, blank=True, null=True, help_text="Suffix text (e.g., '+', '%', 'years')")
     description = models.TextField(blank=True, null=True, help_text="Description or context for the statistic")
     featured = models.BooleanField(default=False, help_text="Mark as featured for display in other sections")

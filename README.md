@@ -1,4 +1,4 @@
-# IITM Backend - Department Management System
+# TRP Backend - Department Management System
 
 A Django-based backend API for managing department information with S3 file storage and MySQL database.
 
