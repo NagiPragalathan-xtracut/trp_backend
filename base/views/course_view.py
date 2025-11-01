@@ -147,8 +147,17 @@ def banner_to_dto(banner):
 
 @swagger_auto_schema(
     method='get',
-    operation_description="Get all courses",
+    operation_description="Get all courses. Optionally filter by department using 'department' query parameter (can be department slug or ID)",
     operation_id="get_all_courses",
+    manual_parameters=[
+        openapi.Parameter(
+            'department',
+            openapi.IN_QUERY,
+            description="Filter courses by department. Can be department slug (e.g., 'computer-science') or department ID (e.g., '1')",
+            type=openapi.TYPE_STRING,
+            required=False
+        )
+    ],
     responses={
         200: openapi.Response(
             description="Courses retrieved successfully",
@@ -168,13 +177,39 @@ def banner_to_dto(banner):
                     }
                 ]
             }
-        )
+        ),
+        404: openapi.Response(description="Department not found (if filtering by department)")
     }
 )
 @api_view(['GET'])
 def get_all_courses(request):
-    """Get all courses"""
+    """Get all courses, optionally filtered by department (slug or ID)"""
     courses = Course.objects.all()
+    
+    # Filter by department if provided
+    department_param = request.query_params.get('department')
+    if department_param:
+        try:
+            # Try to match by slug first
+            try:
+                department = Department.objects.get(slug=department_param)
+            except Department.DoesNotExist:
+                # If slug doesn't match, try ID
+                try:
+                    department = Department.objects.get(id=int(department_param))
+                except (ValueError, Department.DoesNotExist):
+                    return Response(
+                        {"error": f"Department '{department_param}' not found"},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+            
+            courses = courses.filter(department=department)
+        except Exception as e:
+            return Response(
+                {"error": f"Error filtering by department: {str(e)}"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    
     courses_dto = [course_to_dto(course) for course in courses]
     return Response(courses_dto, status=status.HTTP_200_OK)
 

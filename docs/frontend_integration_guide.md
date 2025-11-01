@@ -5,8 +5,21 @@ This guide provides comprehensive instructions for integrating the Django backen
 
 ## Base URL
 ```
-https://your-backend-domain.com/api/v1/
+https://trp-backend.vercel.app/api/v1/
 ```
+
+**Note:** This is the staging endpoint. For production, update to your production domain.
+
+---
+
+## Quick Examples
+
+### 📋 **Departments List Page with Filters**
+See `departments_list_page_example.md` for a complete example of:
+- Departments listing with UG/PG/PhD filter buttons
+- Course accordions under each department
+- Course page links
+- Filtered results based on program level
 
 ---
 
@@ -155,7 +168,7 @@ interface Statistic {
 
 ```typescript
 // lib/api/department.ts
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://your-backend-domain.com/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://trp-backend.vercel.app/api/v1';
 
 export async function getAllDepartments(): Promise<Department[]> {
   const response = await fetch(`${API_BASE_URL}/departments/`);
@@ -199,19 +212,42 @@ export default async function DepartmentPage({ params }: Props) {
     return <div>Department not found</div>;
   }
 
+  // Transform data for your existing components
+  const aboutSection = department.about_sections?.[0]; // Single instance
+  const stats = aboutSection?.numbers?.map(num => ({
+    value: `${num.number || ''}${num.symbol || ''}`,
+    label: num.text || ''
+  })) || [];
+
+  const statisticsBar = department.statistics
+    ?.sort((a, b) => a.display_order - b.display_order)
+    .map(stat => ({
+      number: stat.display_value, // Already formatted: "15+"
+      label: stat.name || ''
+    })) || [];
+
+  const programs = department.programs
+    ?.sort((a, b) => a.display_order - b.display_order)
+    .map(prog => ({
+      title: prog.course?.name || 'Program',
+      description: prog.description, // HTML
+      readMoreLink: prog.explore_link || '#',
+      applyLink: prog.apply_link || '#',
+      isOpen: false
+    })) || [];
+
+  // Hero Banner - Use first banner or programs_image
+  const heroImage = department.banners?.[0]?.image || department.programs_image;
+  const heroAlt = department.banners?.[0]?.alt || department.programs_image_alt;
+
   return (
     <div>
-      {/* Banner Section */}
-      {department.banners && department.banners.length > 0 && (
-        <DepartmentBanner banners={department.banners} />
-      )}
-
-      {/* Hero/Header Section */}
+      {/* Hero Banner Section */}
       <DepartmentHero 
-        name={department.name}
-        vision={department.vision}
-        mission={department.mission}
-        programLevels={{ ug: department.ug, pg: department.pg, phd: department.phd }}
+        title={department.name || "Department"}
+        subtitle={`Department of ${department.name}`}
+        backgroundImage={heroImage}
+        backgroundAlt={heroAlt}
       />
 
       {/* Quick Links Section */}
@@ -225,13 +261,40 @@ export default async function DepartmentPage({ params }: Props) {
       )}
 
       {/* About the Department Section (First, Single Instance) */}
-      {department.about_sections && department.about_sections.length > 0 && (
+      {aboutSection && (
         <AboutSection 
-          heading={department.about_sections[0].heading}
-          content={department.about_sections[0].content}
-          image={department.about_sections[0].image}
-          alt={department.about_sections[0].alt}
-          numbers={department.about_sections[0].numbers}
+          heading={aboutSection.heading || "About The Department"}
+          content={aboutSection.content} // HTML - use dangerouslySetInnerHTML in component
+          image={aboutSection.image}
+          imageAlt={aboutSection.alt}
+          stats={stats} // Transformed: [{value: "2+", label: "Faculty"}, ...]
+        />
+      )}
+
+      {/* Vision & Mission Section (Side-by-Side) */}
+      <VisionMissionSection
+        vision={{
+          icon: <EyeIcon />, // Your icon component
+          title: "Vision",
+          content: department.vision // HTML
+        }}
+        mission={{
+          icon: <GlobeIcon />, // Your icon component
+          title: "Mission",
+          content: department.mission // HTML
+        }}
+      />
+
+      {/* Statistics Bar (Yellow Background) */}
+      {statisticsBar.length > 0 && (
+        <StatisticsBar stats={statisticsBar} />
+      )}
+
+      {/* Programs Offered Section (Accordion) */}
+      {programs.length > 0 && (
+        <ProgramsAccordion 
+          programs={programs}
+          image={department.programs_image}
         />
       )}
 
@@ -1175,7 +1238,7 @@ export async function generateMetadata({ params }: Props) {
 ## 8. ENVIRONMENT VARIABLES
 
 ```env
-NEXT_PUBLIC_API_URL=https://your-backend-domain.com/api/v1
+NEXT_PUBLIC_API_URL=https://trp-backend.vercel.app/api/v1
 ```
 
 ---
