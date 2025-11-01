@@ -210,8 +210,15 @@ def get_all_courses(request):
                 status=status.HTTP_400_BAD_REQUEST
             )
     
-    courses_dto = [course_to_dto(course) for course in courses]
-    return Response(courses_dto, status=status.HTTP_200_OK)
+    try:
+        courses_dto = [course_to_dto(course) for course in courses]
+        return Response(courses_dto, status=status.HTTP_200_OK)
+    except Exception as e:
+        import traceback
+        return Response(
+            {"error": f"Error serializing courses: {str(e)}", "traceback": traceback.format_exc()},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 
 @swagger_auto_schema(

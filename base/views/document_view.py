@@ -6,7 +6,7 @@ from drf_yasg import openapi
 from ..serializers import DepartmentStatisticsSerializer
 from base.models.department_model import (
     Department, AboutDepartment, NumberData, QuickLink,
-    ProgramOffered, Curriculum, Benefit, DepartmentContact,
+    ProgramOffered, Curriculum, DepartmentContact,
     CTA, POPSOPEO, Facility, Banner, DepartmentStatistics
 )
 
@@ -114,15 +114,8 @@ def get_department_detail(request, department_id):
         for curr in curriculum
     ]
     
-    # Get benefits
-    benefits = Benefit.objects.filter(department=department)
-    benefits_data = [
-        {
-            'icon': ben.icon.url if ben.icon else None,
-            'text': ben.text
-        }
-        for ben in benefits
-    ]
+    # Get benefits (Benefit model removed - return empty list)
+    benefits_data = []
     
     # Get contacts
     contacts = DepartmentContact.objects.filter(department=department)
@@ -192,32 +185,39 @@ def get_department_detail(request, department_id):
     ]
 
     # Compile all data
-    department_data = {
-        'id': department.id,
-        'name': department.name,
-        'slug': department.slug,
-        'ug': department.ug,
-        'pg': department.pg,
-        'phd': department.phd,
-        'vision': department.vision,
-        'mission': department.mission,
-        'programs_image': department.programs_image.url if department.programs_image else None,
-        'programs_image_alt': department.programs_image_alt,
-        'facilities_overview': department.facilities_overview,
-        'about_sections': about_data,
-        'quick_links': quick_links_data,
-        'programs': programs_data,
-        'curriculum': curriculum_data,
-        'benefits': benefits_data,
-        'contacts': contacts_data,
-        'ctas': ctas_data,
-        'po_pso_peo': po_pso_peo_data,
-        'facilities': facilities_data,
-        'banners': banners_data,
-        'statistics': statistics_data
-    }
-    
-    return Response(department_data)
+    try:
+        department_data = {
+            'id': department.id,
+            'name': department.name,
+            'slug': department.slug,
+            'ug': department.ug,
+            'pg': department.pg,
+            'phd': department.phd,
+            'vision': department.vision,
+            'mission': department.mission,
+            'programs_image': department.programs_image.url if department.programs_image else None,
+            'programs_image_alt': department.programs_image_alt,
+            'facilities_overview': department.facilities_overview,
+            'about_sections': about_data,
+            'quick_links': quick_links_data,
+            'programs': programs_data,
+            'curriculum': curriculum_data,
+            'benefits': benefits_data,
+            'contacts': contacts_data,
+            'ctas': ctas_data,
+            'po_pso_peo': po_pso_peo_data,
+            'facilities': facilities_data,
+            'banners': banners_data,
+            'statistics': statistics_data
+        }
+        
+        return Response(department_data)
+    except Exception as e:
+        import traceback
+        return Response(
+            {"error": f"Error serializing department data: {str(e)}", "traceback": traceback.format_exc()},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
 
 @swagger_auto_schema(
     method='get',
