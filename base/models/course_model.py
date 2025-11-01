@@ -7,14 +7,13 @@ import uuid
 
 class Course(SEOMixin):
     name = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True, unique=True, help_text="URL-friendly identifier (auto-generated from name if not provided)")
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='courses', null=True, blank=True)
     ug = models.BooleanField(default=False, help_text="Undergraduate program available")
     pg = models.BooleanField(default=False, help_text="Postgraduate program available")
     phd = models.BooleanField(default=False, help_text="PhD program available")
 
     about_the_course = models.TextField(blank=True, null=True)
-    vision = RichTextField(blank=True, null=True)
-    mission = RichTextField(blank=True, null=True)
 
     # Override timestamps for existing model
     created_at = models.DateTimeField(default=timezone.now)
@@ -29,17 +28,15 @@ class Course(SEOMixin):
             self.meta_title = f"{self.name} - Course Information"
 
         if not self.meta_description:
-            description_parts = []
             if self.about_the_course:
-                description_parts.append(str(self.about_the_course)[:150])
-            if self.vision:
-                description_parts.append(str(self.vision)[:150])
-            if self.mission:
-                description_parts.append(str(self.mission)[:150])
-            self.meta_description = " | ".join(description_parts) if description_parts else f"Learn about {self.name} course"
+                self.meta_description = str(self.about_the_course)[:200]
+            else:
+                self.meta_description = f"Learn about {self.name} course"
 
         if not self.canonical_url:
-            if self.id:
+            if self.slug:
+                self.canonical_url = f"/courses/{self.slug}/"
+            elif self.id:
                 self.canonical_url = f"/courses/{self.id}/"
             else:
                 self.canonical_url = "/courses/"
@@ -69,7 +66,7 @@ class Course(SEOMixin):
             self.keywords = ", ".join(keywords)
 
         if not self.author:
-            self.author = "TRP Administration"
+            self.author = "SRM TRP Engineering College"
 
         # Generate basic schema.org JSON-LD
         if not self.schema_json:
@@ -77,15 +74,14 @@ class Course(SEOMixin):
                 "@context": "https://schema.org",
                 "@type": "Course",
                 "name": self.name,
-                "description": self.meta_description[:500] if self.meta_description else f"Course at TRP",
+                "description": self.meta_description[:500] if self.meta_description else f"Course at SRM TRP Engineering College",
                 "provider": {
                     "@type": "EducationalOrganization",
-                    "name": "TRP"
+                    "name": "SRM TRP Engineering College"
                 },
-                "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else f"https://yourdomain.com/courses/{self.id}/"
+                "url": f"https://trp.srmtrichy.edu.in{self.canonical_url}" if self.canonical_url else f"https://trp.srmtrichy.edu.in/courses/{self.slug or self.id}/"
             }
-            if self.department:
-                schema["provider"]["name"] = self.department.name
+            # Provider name is already set to SRM TRP Engineering College
             self.schema_json = str(schema).replace("'", '"')
 
     class Meta:
@@ -129,7 +125,7 @@ class NumberDataATD(models.Model):
 class QuickLinksModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quick_links')
     name = models.CharField(max_length=255, blank=True, null=True)
-    link = models.URLField(blank=True, null=True)
+    link = models.CharField(max_length=500, blank=True, null=True, help_text="Link URL (no validation restrictions)")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -157,9 +153,6 @@ class LabModel(models.Model):
     image = models.ImageField(upload_to='labs/', blank=True, null=True)
     heading = models.CharField(max_length=255, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    alt = models.CharField(max_length=255, blank=True, null=True)
-    link_blank = models.BooleanField(default=True, help_text="Open link in new tab")
-    content = RichTextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -171,16 +164,16 @@ class LabModel(models.Model):
 
 class CurriculumModel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='curriculum')
-    name = models.CharField(max_length=255, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    link_file = models.FileField(upload_to='curriculum_files/', blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True, help_text="Title for the curriculum entry")
+    description = models.TextField(blank=True, null=True, help_text="Description/details for the curriculum")
+    file = models.FileField(upload_to='curriculum_files/', blank=True, null=True, help_text="Optional file attachment")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.name
+        return f"{self.course.name} - {self.title}"
 
     class Meta:
-        ordering = ['name']
+        ordering = ['title']
 
 
 class BenefitsModel(models.Model):
@@ -216,9 +209,14 @@ class CourseContact(models.Model):
 
 
 class CTAModel(models.Model):
+    CTA_TYPE_CHOICES = [
+        ('about', 'About the Course'),
+        ('general', 'General'),
+    ]
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='cta_sections')
     heading = models.CharField(max_length=255, blank=True, null=True)
     link = models.URLField(blank=True, null=True)
+    cta_type = models.CharField(max_length=20, choices=CTA_TYPE_CHOICES, default='general', blank=True, null=True, help_text="Type of CTA to distinguish between different sections")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -35,7 +35,6 @@ def career_success_to_dto(success):
     return {
         'id': success.id,
         'student_name': success.student_name,
-        'year_with_degree': success.year_with_degree,
         'image': success.image.url if success.image else None,
         'alt': success.alt,
         'description': success.description,
@@ -298,11 +297,10 @@ def delete_career_opening(request, opening_id):
     operation_id="create_career_success",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['student_name', 'year_with_degree',  'alt', 
+        required=['student_name', 'alt', 
                  'description',  'department_id', 'batch'],
         properties={
             'student_name': openapi.Schema(type=openapi.TYPE_STRING),
-            'year_with_degree': openapi.Schema(type=openapi.TYPE_STRING),
             'image': openapi.Schema(type=openapi.TYPE_FILE),
             'alt': openapi.Schema(type=openapi.TYPE_STRING),
             'description': openapi.Schema(type=openapi.TYPE_STRING),
@@ -320,7 +318,7 @@ def delete_career_opening(request, opening_id):
 def create_career_success(request):
     """Create a new career success story"""
     required_fields = [
-        'student_name', 'year_with_degree', 'alt', 'description', 
+        'student_name', 'alt', 'description', 
         'department_id', 'batch'
     ]
     
@@ -344,7 +342,6 @@ def create_career_success(request):
     
     success = CareerSuccess.objects.create(
         student_name=request.data['student_name'],
-        year_with_degree=request.data['year_with_degree'],
         image=request.FILES['image'],
         alt=request.data['alt'],
         description=request.data['description'],
@@ -409,7 +406,6 @@ def get_all_career_successes(request):
         queryset = queryset.filter(
             Q(student_name__icontains=search_term) |
             Q(description__icontains=search_term) |
-            Q(year_with_degree__icontains=search_term) |
             Q(department__name__icontains=search_term)
         )
     
@@ -444,7 +440,6 @@ def get_career_success(request, success_id):
         type=openapi.TYPE_OBJECT,
         properties={
             'student_name': openapi.Schema(type=openapi.TYPE_STRING),
-            'year_with_degree': openapi.Schema(type=openapi.TYPE_STRING),
             'image': openapi.Schema(type=openapi.TYPE_FILE),
             'alt': openapi.Schema(type=openapi.TYPE_STRING),
             'description': openapi.Schema(type=openapi.TYPE_STRING),
@@ -466,8 +461,6 @@ def update_career_success(request, success_id):
     # Update fields if provided
     if 'student_name' in request.data:
         success.student_name = request.data['student_name']
-    if 'year_with_degree' in request.data:
-        success.year_with_degree = request.data['year_with_degree']
     if 'image' in request.FILES:
         success.image = request.FILES['image']
     if 'alt' in request.data:

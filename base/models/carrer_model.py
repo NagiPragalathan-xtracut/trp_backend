@@ -48,7 +48,6 @@ class CareerOpening(models.Model):
 
 class CareerSuccess(models.Model):
     student_name = models.CharField(max_length=255)
-    year_with_degree = models.CharField(max_length=100, help_text="e.g., 2023 B.Tech")
     image = models.ImageField(upload_to='career_success/students/', blank=True, null=True)
     alt = models.CharField(max_length=255, help_text="Alt text for student image")
     description = models.TextField()

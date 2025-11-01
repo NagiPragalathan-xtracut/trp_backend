@@ -7,7 +7,7 @@ from drf_yasg import openapi
 from base.models.course_model import (
     Course, AboutTheCourseModel, NumberDataATD, QuickLinksModel,
     SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
-    CourseContact, CTAModel, CourseBanner
+    CTAModel, CourseBanner
 )
 from base.models.department_model import Department
 
@@ -17,6 +17,7 @@ def course_to_dto(course):
     return {
         'id': course.id,
         'name': course.name,
+        'slug': course.slug,
         'department': {
             'id': course.department.id,
             'name': course.department.name
@@ -25,8 +26,6 @@ def course_to_dto(course):
         'pg': course.pg,
         'phd': course.phd,
         'about_the_course': course.about_the_course,
-        'vision': course.vision,
-        'mission': course.mission,
         'created_at': course.created_at,
         'updated_at': course.updated_at,
     }
@@ -85,9 +84,6 @@ def lab_to_dto(lab):
         'image': lab.image.url if lab.image else None,
         'heading': lab.heading,
         'description': lab.description,
-        'alt': lab.alt,
-        'link_blank': lab.link_blank,
-        'content': lab.content,
         'created_at': lab.created_at,
     }
 
@@ -96,9 +92,9 @@ def curriculum_to_dto(curriculum):
     """Convert CurriculumModel to DTO"""
     return {
         'id': curriculum.id,
-        'name': curriculum.name,
+        'title': curriculum.title,
         'description': curriculum.description,
-        'link_file': curriculum.link_file.url if curriculum.link_file else None,
+        'file': curriculum.file.url if curriculum.file else None,
         'created_at': curriculum.created_at,
     }
 

@@ -54,12 +54,14 @@ class SEOMixin(models.Model):
 
 class Department(SEOMixin):
     name = models.CharField(max_length=200, blank=True, null=True)
+    slug = models.SlugField(max_length=200, blank=True, null=True, unique=True, help_text="URL-friendly identifier (auto-generated from name if not provided)")
     ug = models.BooleanField(default=False)
     pg = models.BooleanField(default=False)
     phd = models.BooleanField(default=False)
     vision = RichTextField(blank=True, null=True)
     mission = RichTextField(blank=True, null=True)
     programs_image = models.ImageField(upload_to='department/programs/', blank=True, null=True, help_text="Default image for all programs in this department")
+    programs_image_alt = models.CharField(max_length=200, blank=True, null=True, help_text="Alt text for programs image")
     facilities_overview = RichTextField(blank=True, null=True, help_text="Overview/description for all facilities in this department")
 
     def __str__(self):
@@ -79,7 +81,9 @@ class Department(SEOMixin):
             self.meta_description = " | ".join(description_parts) if description_parts else f"Learn about {self.name} department"
 
         if not self.canonical_url:
-            if self.id:
+            if self.slug:
+                self.canonical_url = f"/departments/{self.slug}/"
+            elif self.id:
                 self.canonical_url = f"/departments/{self.id}/"
             else:
                 self.canonical_url = "/departments/"
@@ -113,7 +117,7 @@ class Department(SEOMixin):
             self.keywords = ", ".join(keywords)
 
         if not self.author:
-            self.author = "IITM Administration"
+            self.author = "SRM TRP Engineering College"
 
         # Generate basic schema.org JSON-LD
         if not self.schema_json:
@@ -121,8 +125,8 @@ class Department(SEOMixin):
                 "@context": "https://schema.org",
                 "@type": "EducationalOrganization",
                 "name": self.name,
-                "description": self.meta_description[:500] if self.meta_description else f"Department at IITM",
-                "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else f"https://yourdomain.com/departments/{self.id}/"
+                "description": self.meta_description[:500] if self.meta_description else f"Department at SRM TRP Engineering College",
+                "url": f"https://trp.srmtrichy.edu.in{self.canonical_url}" if self.canonical_url else f"https://trp.srmtrichy.edu.in/departments/{self.slug or self.id}/"
             }
             self.schema_json = str(schema).replace("'", '"')
 
@@ -154,7 +158,7 @@ class NumberData(models.Model):
 class QuickLink(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='quick_links')
     name = models.CharField(max_length=200, blank=True, null=True)
-    link = models.URLField(blank=True, null=True)
+    link = models.CharField(max_length=500, blank=True, null=True, help_text="Link URL (no validation restrictions)")
     
     def __str__(self):
         return self.name
@@ -179,12 +183,12 @@ class ProgramOffered(models.Model):
 
 class Curriculum(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='curriculum')
-    name = models.CharField(max_length=200, blank=True, null=True)
-    description = models.TextField(blank=True, null=True)
-    file = models.FileField(upload_to='department/curriculum/', blank=True, null=True)
+    title = models.CharField(max_length=200, blank=True, null=True, help_text="Title for the curriculum entry")
+    description = models.TextField(blank=True, null=True, help_text="Description/details for the curriculum")
+    file = models.FileField(upload_to='department/curriculum/', blank=True, null=True, help_text="Optional file attachment")
     
     def __str__(self):
-        return f"{self.department.name} - {self.name}"
+        return f"{self.department.name} - {self.title}"
 
 class Benefit(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='benefits')
@@ -208,9 +212,15 @@ class DepartmentContact(models.Model):
         return f"{self.department.name} - {self.name}"
 
 class CTA(models.Model):
+    CTA_TYPE_CHOICES = [
+        ('about', 'About Department'),
+        ('curriculum', 'Curriculum'),
+        ('general', 'General'),
+    ]
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='ctas')
     heading = models.CharField(max_length=200, blank=True, null=True)
     link = models.URLField(blank=True, null=True)
+    cta_type = models.CharField(max_length=20, choices=CTA_TYPE_CHOICES, default='general', blank=True, null=True, help_text="Type of CTA to distinguish between different sections")
     
     def __str__(self):
         return f"{self.department.name} - {self.heading}"
@@ -229,11 +239,13 @@ class Facility(models.Model):
     heading = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     alt = models.CharField(max_length=200, blank=True, null=True)
-    link_blank = models.BooleanField(default=False)
-    content = RichTextField(blank=True, null=True)
     
     def __str__(self):
         return f"{self.department.name} - {self.heading}"
+    
+    class Meta:
+        verbose_name = "Facility"
+        verbose_name_plural = "Facilities"
 
 class Banner(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='banners')
@@ -249,7 +261,6 @@ class DepartmentStatistics(models.Model):
     name = models.CharField(max_length=255, blank=True, null=True, help_text="Name of the statistical data (e.g., 'Students Enrolled')")
     number = models.IntegerField(blank=True, null=True, help_text="Numeric value for the statistic")
     suffix = models.CharField(max_length=50, blank=True, null=True, help_text="Suffix text (e.g., '+', '%', 'years')")
-    description = models.TextField(blank=True, null=True, help_text="Description or context for the statistic")
     featured = models.BooleanField(default=False, help_text="Mark as featured for display in other sections")
     display_order = models.PositiveIntegerField(default=0, help_text="Order for displaying statistics")
 

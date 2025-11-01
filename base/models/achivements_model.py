@@ -32,7 +32,7 @@ class StudentAchievement(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='student_achievements')
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_achievements')
     date = models.DateField()
-    description = RichTextField()
+    description = RichTextField(blank=True, null=True)
     relevant_link = models.URLField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

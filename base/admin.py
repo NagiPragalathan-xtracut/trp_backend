@@ -1,14 +1,16 @@
 from django.contrib import admin
+from django.db import models
+from django.forms import BaseInlineFormSet
 from django.utils.html import format_html
 from base.models.department_model import (
     Department, AboutDepartment, NumberData, QuickLink,
-    ProgramOffered, Curriculum, Benefit, DepartmentContact,
+    ProgramOffered, Curriculum,
     CTA, POPSOPEO, Facility, Banner, DepartmentStatistics
 )
 from base.models.course_model import (
     Course, AboutTheCourseModel, NumberDataATD, QuickLinksModel,
     SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
-    CourseContact, CTAModel, CourseBanner
+    CTAModel, CourseBanner
 )
 from base.models.faculty_model import (
     Faculty, Designation, FacultyBanner
@@ -42,7 +44,11 @@ class NumberDataInline(admin.TabularInline):
 
 class AboutDepartmentInline(admin.StackedInline):
     model = AboutDepartment
-    extra = 1
+    extra = 0
+    max_num = 1
+    verbose_name = "About the Department"
+    verbose_name_plural = "About the Department"
+    fields = ['heading', ('image', 'alt'), 'content']
 
 class QuickLinkInline(admin.TabularInline):
     model = QuickLink
@@ -50,13 +56,13 @@ class QuickLinkInline(admin.TabularInline):
 class DepartmentStatisticsInline(admin.TabularInline):
     model = DepartmentStatistics
     extra = 1
-    fields = ['name', 'number', 'suffix', 'description', 'featured', 'display_order']
+    fields = ['name', 'number', 'suffix', 'featured', 'display_order']
     ordering = ['display_order']
 
 class ProgramOfferedInline(admin.StackedInline):
     model = ProgramOffered
     extra = 2  # Show 2 empty forms for adding new programs
-    fields = ['name', 'course', 'display_order', 'description', 'explore_link', 'apply_link']
+    fields = ['course', 'display_order', 'description', 'explore_link', 'apply_link']
     readonly_fields = []
     ordering = ['display_order']
 
@@ -95,19 +101,18 @@ class ProgramOfferedInline(admin.StackedInline):
 
 class CurriculumInline(admin.StackedInline):
     model = Curriculum
-    extra = 1
+    extra = 0
+    verbose_name = "Curriculum Entry"
+    verbose_name_plural = "Curriculum Entries"
+    fields = ['title', 'description', 'file']
 
-class BenefitInline(admin.TabularInline):
-    model = Benefit
-    extra = 1
-
-class DepartmentContactInline(admin.StackedInline):
-    model = DepartmentContact
-    extra = 1
-
-class CTAInline(admin.TabularInline):
+class CTAInline(admin.StackedInline):
     model = CTA
-    extra = 1
+    extra = 0
+    max_num = 1
+    verbose_name = "CTA"
+    verbose_name_plural = "CTA"
+    fields = ['heading', 'link']
 
 class POPSOPEOInline(admin.StackedInline):
     model = POPSOPEO
@@ -116,11 +121,13 @@ class POPSOPEOInline(admin.StackedInline):
 class FacilityInline(admin.StackedInline):
     model = Facility
     extra = 1
+    fields = ['heading', ('image', 'alt'), 'description']
 
 
 class BannerInline(admin.StackedInline):
     model = Banner
     extra = 1
+    fields = [('image', 'alt')]
 
 # ============================================================================
 # COURSE MODELS - INLINE CONFIGURATIONS
@@ -132,7 +139,11 @@ class NumberDataATDInline(admin.TabularInline):
 
 class AboutTheCourseInline(admin.StackedInline):
     model = AboutTheCourseModel
-    extra = 1
+    extra = 0
+    max_num = 1
+    verbose_name = "About the Course"
+    verbose_name_plural = "About the Course"
+    fields = ['heading', ('image', 'alt'), 'content']
 
 class QuickLinksInline(admin.TabularInline):
     model = QuickLinksModel
@@ -145,27 +156,63 @@ class SubjectsInline(admin.StackedInline):
 class LabInline(admin.StackedInline):
     model = LabModel
     extra = 1
+    fields = ['heading', 'image', 'description']
 
 class CurriculumCourseInline(admin.StackedInline):
     model = CurriculumModel
-    extra = 1
+    extra = 0
+    verbose_name = "Curriculum Entry"
+    verbose_name_plural = "Curriculum Entries"
+    fields = ['title', 'description', 'file']
 
 class BenefitsInline(admin.TabularInline):
     model = BenefitsModel
     extra = 1
 
 
-class CTACourseInline(admin.TabularInline):
+class AboutTheCourseCTAFormSet(BaseInlineFormSet):
+    def save(self, commit=True):
+        instances = super().save(commit=False)
+        for instance in instances:
+            instance.cta_type = 'about'
+            if commit:
+                instance.save()
+        if commit:
+            self.save_m2m()
+        return instances
+
+class AboutTheCourseCTAInline(admin.StackedInline):
     model = CTAModel
-    extra = 1
+    formset = AboutTheCourseCTAFormSet
+    extra = 0
+    max_num = 1
+    verbose_name = "CTA (Optional)"
+    verbose_name_plural = "CTA (Optional)"
+    classes = ('collapse',)
+    fields = ['heading', 'link']
+    exclude = ['cta_type']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(cta_type='about')
+
+class CTACourseInline(admin.StackedInline):
+    model = CTAModel
+    extra = 0
+    max_num = 1
+    verbose_name = "CTA"
+    verbose_name_plural = "CTA"
+    fields = ['heading', 'link']
+    exclude = ['cta_type']
+    
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.filter(cta_type__in=['general', '']) | qs.filter(cta_type__isnull=True)
 
 class CourseBannerInline(admin.StackedInline):
     model = CourseBanner
     extra = 1
-
-class CourseContactInline(admin.StackedInline):
-    model = CourseContact
-    extra = 1
+    fields = [('image', 'alt')]
 
 # ============================================================================
 # FACULTY MODELS - INLINE CONFIGURATIONS
@@ -207,6 +254,11 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_filter = ['ug', 'pg', 'phd']
     search_fields = ['name']
     readonly_fields = ['created_at', 'updated_at']
+    
+    class Media:
+        css = {
+            'all': ('base/css/admin_custom.css',)
+        }
 
     def stats_count(self, obj):
         return obj.statistics.count()
@@ -222,19 +274,16 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'ug', 'pg', 'phd', 'vision', 'mission')
+            'fields': ('name', 'slug', ('ug', 'pg', 'phd'), ('vision', 'mission'))
         }),
-        ('Media & Content', {
-            'fields': ('programs_image', 'facilities_overview')
+        ('Misc.', {
+            'fields': (('programs_image', 'programs_image_alt'), 'facilities_overview')
         }),
         ('SEO & Meta Data', {
             'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
                       'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
                       'keywords', 'author', 'published_date', 'is_published', 'featured'),
             'classes': ('collapse',)
-        }),
-        ('Statistics', {
-            'fields': ()
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -244,18 +293,35 @@ class DepartmentAdmin(admin.ModelAdmin):
 
     
     inlines = [
+        AboutDepartmentInline,
         BannerInline,
         QuickLinkInline,
         DepartmentStatisticsInline,
-        AboutDepartmentInline,
         ProgramOfferedInline,
         POPSOPEOInline,
-        DepartmentContactInline,
-        BenefitInline,
         FacilityInline,
         CurriculumInline,
         CTAInline,
     ]
+    
+    def save_formset(self, request, form, formset, change):
+        """Override to auto-increment display_order for ProgramOffered"""
+        instances = formset.save(commit=False)
+        for obj in formset.deleted_objects:
+            obj.delete()
+        
+        for instance in instances:
+            # Auto-increment display_order for ProgramOffered if not set
+            if isinstance(instance, ProgramOffered) and not instance.display_order:
+                max_order = ProgramOffered.objects.filter(
+                    department=instance.department
+                ).exclude(id=instance.id if instance.id else None).aggregate(
+                    max_order=models.Max('display_order')
+                )['max_order']
+                instance.display_order = (max_order or 0) + 1 if max_order is not None else 1
+            instance.save()
+        
+        formset.save_m2m()
     
     def has_ug(self, obj):
         return '✓' if obj.ug else '✗'
@@ -347,10 +413,15 @@ class CourseAdmin(admin.ModelAdmin):
     list_filter = ['ug', 'pg', 'phd', 'created_at']
     search_fields = ['name']
     readonly_fields = ['created_at', 'updated_at']
+    
+    class Media:
+        css = {
+            'all': ('base/css/admin_custom.css',)
+        }
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'department', 'ug', 'pg', 'phd', 'vision', 'mission')
+            'fields': ('name', 'slug', 'department', ('ug', 'pg', 'phd'))
         }),
         ('SEO & Meta Data', {
             'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
@@ -365,14 +436,13 @@ class CourseAdmin(admin.ModelAdmin):
     )
     
     inlines = [
-        CourseBannerInline,
         AboutTheCourseInline,
+        AboutTheCourseCTAInline,
+        CourseBannerInline,
         QuickLinksInline,
         SubjectsInline,
         LabInline,
         CurriculumCourseInline,
-        CourseContactInline,
-        # BenefitsInline,
         CTACourseInline,
     ]
     
@@ -433,11 +503,12 @@ class CourseAdmin(admin.ModelAdmin):
 #     list_filter = ['course', 'created_at']
 #     search_fields = ['text', 'course__name']
 
-@admin.register(CourseContact)
-class CourseContactAdmin(admin.ModelAdmin):
-    list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
-    list_filter = ['course', 'position', 'created_at']
-    search_fields = ['name', 'mail', 'phone', 'course__name']
+# CourseContact model removed - handled by Department contacts
+# @admin.register(CourseContact)
+# class CourseContactAdmin(admin.ModelAdmin):
+#     list_display = ['name', 'position', 'mail', 'phone', 'course', 'created_at']
+#     list_filter = ['course', 'position', 'created_at']
+#     search_fields = ['name', 'mail', 'phone', 'course__name']
 
 # @admin.register(CTAModel)
 # class CTAModelAdmin(admin.ModelAdmin):
@@ -473,22 +544,15 @@ class FacultyAdmin(admin.ModelAdmin):
     list_select_related = ['designation', 'department']
     readonly_fields = ['created_at', 'updated_at']
 
-    inlines = [
-        FacultyBannerInline,
-    ]
-
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'alt', 'image', 'designation', 'department')
+            'fields': ('name', 'slug', 'qualification', 'alt', 'image', 'designation', 'department')
         }),
         ('Contact Information', {
             'fields': ('mail_id', 'phone_number', 'link')
         }),
-        ('Content', {
-            'fields': ('content', 'qualification', 'bio')
-        }),
         ('Professional Information', {
-            'fields': ('publication', 'awards', 'workshop', 'work_experience', 'projects'),
+            'fields': ('bio', 'publication', 'awards', 'workshop', 'work_experience', 'projects'),
             'classes': ('collapse',)
         }),
         ('SEO & Meta Data', {
@@ -620,7 +684,8 @@ class StudentAchievementAdmin(admin.ModelAdmin):
             'fields': ('image', 'image_preview', 'alt')
         }),
         ('Content', {
-            'fields': ('description', 'relevant_link')
+            'fields': ('description', 'relevant_link'),
+            'classes': ('collapse',)
         }),
         ('System Fields', {
             'fields': ('unique_id', 'created_at', 'updated_at'),
@@ -681,9 +746,9 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(CareerSuccess)
 class CareerSuccessAdmin(admin.ModelAdmin):
-    list_display = ['student_name', 'year_with_degree', 'department', 'company', 'batch', 'student_image_preview', 'created_at']
+    list_display = ['student_name', 'department', 'company', 'batch', 'student_image_preview', 'created_at']
     list_filter = ['department', 'company', 'batch', 'created_at']
-    search_fields = ['student_name', 'year_with_degree', 'description', 'department__name', 'company__name', 'batch']
+    search_fields = ['student_name', 'description', 'department__name', 'company__name', 'batch']
     readonly_fields = ['unique_id', 'created_at', 'updated_at', 'student_image_preview']
 
     def get_queryset(self, request):
@@ -692,7 +757,7 @@ class CareerSuccessAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Student Information', {
-            'fields': ('student_name', 'year_with_degree', 'batch', 'department')
+            'fields': ('student_name', 'batch', 'department')
         }),
         ('Student Media', {
             'fields': ('image', 'student_image_preview', 'alt')
@@ -811,7 +876,7 @@ class NewsEventsAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('heading', 'category', 'department', 'date')
+            'fields': ('heading', 'slug', 'category', 'department', 'date')
         }),
         ('Content', {
             'fields': ('content', 'link')

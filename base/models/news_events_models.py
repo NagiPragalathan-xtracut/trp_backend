@@ -1,8 +1,10 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from base.models.department_model import Department, SEOMixin
 import uuid
+import re
 
 class MetaData(models.Model):
     """SEO metadata for news and events pages"""
@@ -73,6 +75,7 @@ class NewsEvents(SEOMixin):
     ]
 
     heading = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True, unique=True, help_text="URL-friendly identifier (auto-generated from heading if not provided)")
     date = models.DateField(blank=True, null=True)
     link = models.URLField(blank=True, null=True, help_text="External link for the news/event")
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, blank=True, null=True)
@@ -98,16 +101,41 @@ class NewsEvents(SEOMixin):
 
     def generate_seo_data(self):
         """Generate SEO data for news/events"""
+        # Auto-generate slug from heading if not provided
+        if not self.slug and self.heading:
+            base_slug = slugify(self.heading)
+            # Ensure uniqueness
+            if self.id:
+                existing = NewsEvents.objects.filter(slug=base_slug).exclude(id=self.id).exists()
+            else:
+                existing = NewsEvents.objects.filter(slug=base_slug).exists()
+            
+            if existing:
+                # Add unique suffix
+                counter = 1
+                while NewsEvents.objects.filter(slug=f"{base_slug}-{counter}").exists():
+                    counter += 1
+                self.slug = f"{base_slug}-{counter}"
+            else:
+                self.slug = base_slug
+        
         if not self.meta_title:
-            self.meta_title = f"{self.heading} - {self.get_category_display()} | IITM"
+            self.meta_title = f"{self.heading} - {self.get_category_display()} | SRM TRP Engineering College"
 
         if not self.meta_description:
-            # Extract first 160 characters from content
-            content_text = str(self.content).replace('<[^<]+?>', '')  # Remove HTML tags
-            self.meta_description = content_text[:160] if content_text else f"{self.heading} - {self.get_category_display()}"
+            # Extract first 160 characters from content, remove HTML tags
+            if self.content:
+                # Remove HTML tags more effectively
+                content_text = re.sub(r'<[^>]+>', '', str(self.content))
+                content_text = content_text.strip()
+                self.meta_description = content_text[:160] if content_text else f"{self.heading} - {self.get_category_display()}"
+            else:
+                self.meta_description = f"{self.heading} - {self.get_category_display()}"
 
         if not self.canonical_url:
-            if self.id:
+            if self.slug:
+                self.canonical_url = f"/news-events/{self.slug}/"
+            elif self.id:
                 self.canonical_url = f"/news-events/{self.id}/"
             else:
                 self.canonical_url = "/news-events/"
@@ -133,13 +161,19 @@ class NewsEvents(SEOMixin):
             self.twitter_image = self.og_image
 
         if not self.keywords:
-            keywords = [self.heading.lower(), self.get_category_display().lower(), self.department.name.lower()]
+            keywords = []
+            if self.heading:
+                keywords.append(self.heading.lower())
+            if self.category:
+                keywords.append(self.get_category_display().lower())
+            if self.department and self.department.name:
+                keywords.append(self.department.name.lower())
             if self.tags.exists():
                 keywords.extend([tag.tag_name.lower() for tag in self.tags.all()])
-            self.keywords = ", ".join(keywords)
+            self.keywords = ", ".join(keywords) if keywords else ""
 
         if not self.author:
-            self.author = "IITM Administration"
+            self.author = "SRM TRP Engineering College"
 
         # Generate schema.org JSON-LD for NewsArticle or Event
         if not self.schema_json:
@@ -153,17 +187,14 @@ class NewsEvents(SEOMixin):
                 "dateModified": self.updated_at.isoformat() if self.updated_at else None,
                 "author": {
                     "@type": "Organization",
-                    "name": "IITM"
+                    "name": "SRM TRP Engineering College"
                 },
                 "publisher": {
                     "@type": "EducationalOrganization",
-                    "name": self.department.name if self.department else "IITM"
+                    "name": "SRM TRP Engineering College"
                 },
-                "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else f"https://yourdomain.com/news-events/{self.id}/"
+                "url": self.link if self.link else (f"https://trp.srmtrichy.edu.in{self.canonical_url}" if self.canonical_url else f"https://trp.srmtrichy.edu.in/news-events/{self.slug or self.id}/")
             }
-
-            if self.link:
-                schema["url"] = self.link
 
             if primary_image:
                 schema["image"] = primary_image.image.url

@@ -243,7 +243,7 @@ def delete_college_achievement(request, achievement_id):
     operation_id="create_student_achievement",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['image', 'alt', 'department_id', 'date', 'description'],
+        required=['image', 'alt', 'department_id', 'date'],
         properties={
             'image': openapi.Schema(type=openapi.TYPE_FILE),
             'alt': openapi.Schema(type=openapi.TYPE_STRING),
@@ -264,7 +264,7 @@ def create_student_achievement(request):
     """Create a new student achievement"""
     # Validate required fields
     if not all([request.data.get('department_id'), request.data.get('date'),
-                request.data.get('description'), request.FILES.get('image'),
+                request.FILES.get('image'),
                 request.data.get('alt')]):
         return Response(
             {"error": "Missing required fields"}, 
@@ -283,7 +283,7 @@ def create_student_achievement(request):
         department=department,
         course=course,
         date=request.data['date'],
-        description=request.data['description'],
+        description=request.data.get('description'),
         relevant_link=request.data.get('relevant_link')
     )
     

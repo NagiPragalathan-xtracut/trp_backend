@@ -1,0 +1,37 @@
+/* Custom Admin CSS - Required Field Indicators */
+/* Ensure required fields show a red asterisk */
+.required {
+    color: #dc3545 !important;
+    font-weight: bold;
+}
+
+/* Make the asterisk more visible */
+label.required::after {
+    content: " *";
+    color: #dc3545 !important;
+    font-weight: bold;
+}
+
+/* For fieldsets */
+fieldset .form-row label.required::after {
+    content: " *";
+    color: #dc3545 !important;
+    font-weight: bold;
+}
+
+/* For inline forms */
+.inline-group .form-row label.required::after {
+    content: " *";
+    color: #dc3545 !important;
+    font-weight: bold;
+}
+
+/* Ensure asterisk is visible in all admin forms */
+.form-row label.required::after,
+fieldset label.required::after {
+    content: " *";
+    color: #dc3545 !important;
+    font-weight: bold;
+    margin-left: 2px;
+}
+

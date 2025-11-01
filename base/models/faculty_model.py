@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from base.models.department_model import Department, SEOMixin
 import uuid
@@ -20,6 +21,7 @@ class Designation(models.Model):
 
 class Faculty(SEOMixin):
     name = models.CharField(max_length=255, blank=True, null=True)
+    slug = models.SlugField(max_length=255, blank=True, null=True, unique=True, help_text="URL-friendly identifier (auto-generated from name if not provided)")
     alt = models.CharField(max_length=255, help_text="Alt text for image", blank=True, null=True)
     image = models.ImageField(upload_to='faculty/images/', blank=True, null=True)
     designation = models.ForeignKey(Designation, on_delete=models.SET_NULL, null=True, blank=True, related_name='faculty_members')
@@ -27,8 +29,7 @@ class Faculty(SEOMixin):
     mail_id = models.EmailField(blank=True, null=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
     link = models.URLField(blank=True, null=True, help_text="Personal website or profile link")
-    content = RichTextField(blank=True, null=True, help_text="General content about faculty")
-    qualification = RichTextField(help_text="Educational qualifications", blank=True, null=True)
+    qualification = models.CharField(max_length=500, help_text="Educational qualifications", blank=True, null=True)
     bio = RichTextField(help_text="Biography", blank=True, null=True)
     publication = RichTextField(blank=True, null=True, help_text="Publications and research papers")
     awards = RichTextField(blank=True, null=True, help_text="Awards and recognitions")
@@ -46,6 +47,24 @@ class Faculty(SEOMixin):
 
     def generate_seo_data(self):
         """Generate SEO data for faculty"""
+        # Auto-generate slug from name if not provided
+        if not self.slug and self.name:
+            base_slug = slugify(self.name)
+            # Ensure uniqueness
+            if self.id:
+                existing = Faculty.objects.filter(slug=base_slug).exclude(id=self.id).exists()
+            else:
+                existing = Faculty.objects.filter(slug=base_slug).exists()
+            
+            if existing:
+                # Add unique suffix
+                counter = 1
+                while Faculty.objects.filter(slug=f"{base_slug}-{counter}").exists():
+                    counter += 1
+                self.slug = f"{base_slug}-{counter}"
+            else:
+                self.slug = base_slug
+        
         if not self.meta_title:
             desig = self.designation.name if self.designation else "Faculty"
             dept = self.department.name if self.department else ""
@@ -58,15 +77,15 @@ class Faculty(SEOMixin):
                 description_parts.append(str(self.bio)[:150])
             if self.qualification:
                 description_parts.append(str(self.qualification)[:150])
-            if self.content:
-                description_parts.append(str(self.content)[:150])
             desig = self.designation.name if self.designation else "Faculty"
             dept = self.department.name if self.department else ""
             tail = f", {desig}{' at ' + dept if dept else ''}" if (self.name or desig or dept) else ""
             self.meta_description = " | ".join(description_parts) if description_parts else f"Learn about {self.name or desig}{tail}"
 
         if not self.canonical_url:
-            if self.id:
+            if self.slug:
+                self.canonical_url = f"/faculty/{self.slug}/"
+            elif self.id:
                 self.canonical_url = f"/faculty/{self.id}/"
             else:
                 self.canonical_url = "/faculty/"
@@ -103,7 +122,7 @@ class Faculty(SEOMixin):
             self.keywords = ", ".join(keywords)
 
         if not self.author:
-            self.author = "IITM Administration"
+            self.author = "SRM TRP Engineering College"
 
         # Generate basic schema.org JSON-LD for Person
         if not self.schema_json:
@@ -114,10 +133,10 @@ class Faculty(SEOMixin):
                 "jobTitle": self.designation.name if self.designation else "",
                 "worksFor": {
                     "@type": "EducationalOrganization",
-                    "name": self.department.name if self.department else ""
+                    "name": "SRM TRP Engineering College"
                 },
-                "description": self.meta_description[:500] if self.meta_description else (f"Faculty member at {self.department.name}" if self.department else "Faculty member"),
-                "url": f"https://yourdomain.com{self.canonical_url}" if self.canonical_url else (f"https://yourdomain.com/faculty/{self.id}/" if self.id else "")
+                "description": self.meta_description[:500] if self.meta_description else "Faculty member at SRM TRP Engineering College",
+                "url": self.link if self.link else (f"https://trp.srmtrichy.edu.in{self.canonical_url}" if self.canonical_url else (f"https://trp.srmtrichy.edu.in/faculty/{self.slug or self.id}/" if self.id else ""))
             }
             if self.mail_id:
                 schema["email"] = self.mail_id

@@ -39,13 +39,14 @@ def faculty_to_dto(faculty, include_full_details=False):
     basic_dto = {
         'id': faculty.id,
         'name': faculty.name,
+        'slug': faculty.slug,
         'alt': faculty.alt,
         'image': faculty.image.url if faculty.image else None,
-        'designation': designation_to_dto(faculty.designation),
+        'designation': designation_to_dto(faculty.designation) if faculty.designation else None,
         'department': {
             'id': faculty.department.id,
             'name': faculty.department.name,
-        },
+        } if faculty.department else None,
         'mail_id': faculty.mail_id,
         'phone_number': faculty.phone_number,
         'link': faculty.link,
@@ -55,7 +56,6 @@ def faculty_to_dto(faculty, include_full_details=False):
     
     if include_full_details:
         basic_dto.update({
-            'content': faculty.content,
             'qualification': faculty.qualification,
             'bio': faculty.bio,
             'publication': faculty.publication,
@@ -232,8 +232,8 @@ def get_all_faculty(request):
                     "mail_id": "john.doe@iitm.ac.in",
                     "phone_number": "+91-9876543210",
                     "link": "https://john-doe-profile.com",
-                    "content": "<p>General content</p>",
-                    "qualification": "<p>PhD in Computer Science</p>",
+                    "slug": "dr-john-doe",
+                    "qualification": "PhD in Computer Science",
                     "bio": "<p>Biography content</p>",
                     "publication": "<p>Publications</p>",
                     "awards": "<p>Awards and recognitions</p>",

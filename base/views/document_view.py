@@ -89,14 +89,13 @@ def get_department_detail(request, department_id):
     programs_data = [
         {
             'id': prog.id,
-            'name': prog.name,
             'course': {
                 'id': prog.course.id if prog.course else None,
-                'name': prog.course.name if prog.course else None
+                'name': prog.course.name if prog.course else None,
+                'slug': prog.course.slug if prog.course else None
             } if prog.course else None,
             'display_order': prog.display_order,
             'description': prog.description,
-            'image': department.programs_image.url if department.programs_image else None,
             'explore_link': prog.explore_link,
             'apply_link': prog.apply_link
         }
@@ -107,7 +106,8 @@ def get_department_detail(request, department_id):
     curriculum = Curriculum.objects.filter(department=department)
     curriculum_data = [
         {
-            'name': curr.name,
+            'id': curr.id,
+            'title': curr.title,
             'description': curr.description,
             'file': curr.file.url if curr.file else None
         }
@@ -157,12 +157,11 @@ def get_department_detail(request, department_id):
     facilities = Facility.objects.filter(department=department)
     facilities_data = [
         {
+            'id': fac.id,
             'heading': fac.heading,
             'description': fac.description,
             'image': fac.image.url if fac.image else None,
-            'alt': fac.alt,
-            'link_blank': fac.link_blank,
-            'content': fac.content
+            'alt': fac.alt
         }
         for fac in facilities
     ]
@@ -185,7 +184,6 @@ def get_department_detail(request, department_id):
             'name': stat.name,
             'number': stat.number,
             'suffix': stat.suffix,
-            'description': stat.description,
             'featured': stat.featured,
             'display_order': stat.display_order,
             'display_value': f"{stat.number}{stat.suffix}" if stat.suffix else str(stat.number)
@@ -197,12 +195,14 @@ def get_department_detail(request, department_id):
     department_data = {
         'id': department.id,
         'name': department.name,
+        'slug': department.slug,
         'ug': department.ug,
         'pg': department.pg,
         'phd': department.phd,
         'vision': department.vision,
         'mission': department.mission,
         'programs_image': department.programs_image.url if department.programs_image else None,
+        'programs_image_alt': department.programs_image_alt,
         'facilities_overview': department.facilities_overview,
         'about_sections': about_data,
         'quick_links': quick_links_data,
@@ -250,10 +250,12 @@ def get_all_departments(request):
         {
             'id': dept.id,
             'name': dept.name,
+            'slug': dept.slug,
             'ug': dept.ug,
             'pg': dept.pg,
             'phd': dept.phd,
             'programs_image': dept.programs_image.url if dept.programs_image else None,
+            'programs_image_alt': dept.programs_image_alt,
             'facilities_overview': dept.facilities_overview
         }
         for dept in departments
