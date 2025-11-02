@@ -127,11 +127,12 @@ app_name = 'base'
 urlpatterns = [
     # Department API v1 endpoints
     path('v1/departments/', get_all_departments, name='departments_list'),
-    path('v1/departments/<int:department_id>/', get_department_detail, name='department_detail'),
-    path('v1/departments/<int:department_id>/programs/', get_department_programs, name='department_programs'),
-    path('v1/departments/<int:department_id>/facilities/', get_department_facilities, name='department_facilities'),
-    path('v1/departments/<int:department_id>/statistics/', get_department_statistics, name='get_department_statistics'),
-    path('v1/departments/<int:department_id>/statistics/create/', create_department_statistic, name='create_department_statistic'),
+    # Support both slug and ID for department detail
+    path('v1/departments/<str:department_id>/', get_department_detail, name='department_detail'),
+    path('v1/departments/<str:department_id>/programs/', get_department_programs, name='department_programs'),
+    path('v1/departments/<str:department_id>/facilities/', get_department_facilities, name='department_facilities'),
+    path('v1/departments/<str:department_id>/statistics/', get_department_statistics, name='get_department_statistics'),
+    path('v1/departments/<str:department_id>/statistics/create/', create_department_statistic, name='create_department_statistic'),
     path('v1/departments/featured-statistics/', get_all_featured_statistics, name='get_all_featured_statistics'),
     
     # Course API v1 endpoints
@@ -148,7 +149,7 @@ urlpatterns = [
     path('v1/featured-data/', get_featured_number_data, name='featured_number_data'),
 
     # Department-Course relationship endpoints
-    path('v1/departments/<int:department_id>/courses/', get_courses_by_department, name='courses_by_department'),
+    path('v1/departments/<str:department_id>/courses/', get_courses_by_department, name='courses_by_department'),
     path('v1/courses/<int:course_id>/department/', get_course_department, name='course_department'),
     path('v1/courses/without-department/', get_courses_without_department, name='courses_without_department'),
 
@@ -164,10 +165,10 @@ urlpatterns = [
     path('v1/designations/', get_all_designations, name='designations_list'),
     path('v1/designations/<int:designation_id>/', get_designation_detail, name='designation_detail'),
     path('v1/faculty/', get_all_faculty, name='faculty_list'),
-    path('v1/faculty/<int:faculty_id>/', get_faculty_detail, name='faculty_detail'),
+    path('v1/faculty/<str:faculty_id>/', get_faculty_detail, name='faculty_detail'),
     path('v1/faculty/name/<str:faculty_name>/', get_faculty_by_name, name='faculty_by_name'),
     path('v1/faculty/search/<str:search_term>/', search_faculty_by_name, name='search_faculty'),
-    path('v1/faculty/department/<int:department_id>/', get_faculty_by_department, name='faculty_by_department'),
+    path('v1/faculty/department/<str:department_id>/', get_faculty_by_department, name='faculty_by_department'),
     path('v1/faculty/designation/<int:designation_id>/', get_faculty_by_designation, name='faculty_by_designation'),
     path('v1/faculty/<int:faculty_id>/banners/', get_faculty_banners, name='faculty_banners'),
     

@@ -14,6 +14,8 @@ class Course(SEOMixin):
     phd = models.BooleanField(default=False, help_text="PhD program available")
 
     about_the_course = models.TextField(blank=True, null=True)
+    lab_overview = RichTextField(blank=True, null=True, help_text="Overview/description for all labs in this course")
+    misc = RichTextField(blank=True, null=True, help_text="Miscellaneous content for the course")
 
     # Override timestamps for existing model
     created_at = models.DateTimeField(default=timezone.now)
@@ -47,11 +49,32 @@ class Course(SEOMixin):
         if not self.og_description:
             self.og_description = self.meta_description[:200] if self.meta_description else f"Learn about {self.name}"
 
+        if not self.og_locale:
+            self.og_locale = "en_US"
+
+        if not self.og_site_name:
+            self.og_site_name = "SRM TRP Trichy"
+
+        if not self.og_url:
+            if self.canonical_url:
+                self.og_url = f"https://trp.srmtrichy.edu.in{self.canonical_url}" if not self.canonical_url.startswith('http') else self.canonical_url
+            else:
+                if self.slug:
+                    self.og_url = f"https://trp.srmtrichy.edu.in/courses/{self.slug}/"
+                elif self.id:
+                    self.og_url = f"https://trp.srmtrichy.edu.in/courses/{self.id}/"
+
         if not self.twitter_title:
             self.twitter_title = self.og_title[:70] if self.og_title else f"{self.name}"
 
         if not self.twitter_description:
             self.twitter_description = self.og_description[:200] if self.og_description else f"Learn about {self.name}"
+
+        if not self.twitter_image:
+            self.twitter_image = self.og_image
+
+        if not self.twitter_data1:
+            self.twitter_data1 = self.author or "SRM TRP Engineering College"
 
         if not self.keywords:
             keywords = [self.name.lower()]
@@ -68,21 +91,79 @@ class Course(SEOMixin):
         if not self.author:
             self.author = "SRM TRP Engineering College"
 
-        # Generate basic schema.org JSON-LD
+        # Generate comprehensive schema.org JSON-LD
         if not self.schema_json:
+            import json
+            from datetime import datetime
+            
+            canonical_url = self.canonical_url if self.canonical_url else f"/courses/{self.slug or self.id}/"
+            full_url = f"https://trp.srmtrichy.edu.in{canonical_url}" if not canonical_url.startswith('http') else canonical_url
+            
+            # Format dates
+            published_iso = self.published_date.isoformat() + "+05:30" if self.published_date else datetime.now().strftime("%Y-%m-%dT%H:%M:%S+05:30")
+            modified_iso = self.updated_date.strftime("%Y-%m-%dT%H:%M:%S+05:30") if self.updated_date else datetime.now().strftime("%Y-%m-%dT%H:%M:%S+05:30")
+            
+            author_slug = (self.author or "SRM TRP Engineering College").lower().replace(' ', '-').replace('.', '').replace(',', '')
+            
             schema = {
                 "@context": "https://schema.org",
-                "@type": "Course",
-                "name": self.name,
-                "description": self.meta_description[:500] if self.meta_description else f"Course at SRM TRP Engineering College",
-                "provider": {
-                    "@type": "EducationalOrganization",
-                    "name": "SRM TRP Engineering College"
-                },
-                "url": f"https://trp.srmtrichy.edu.in{self.canonical_url}" if self.canonical_url else f"https://trp.srmtrichy.edu.in/courses/{self.slug or self.id}/"
+                "@graph": [
+                    {
+                        "@type": "Organization",
+                        "@id": "https://trp.srmtrichy.edu.in/#organization",
+                        "name": "SRM TRP Trichy"
+                    },
+                    {
+                        "@type": "WebSite",
+                        "@id": "https://trp.srmtrichy.edu.in/#website",
+                        "url": "https://trp.srmtrichy.edu.in",
+                        "name": "SRM TRP Trichy",
+                        "publisher": {"@id": "https://trp.srmtrichy.edu.in/#organization"},
+                        "inLanguage": "en-US",
+                        "potentialAction": {
+                            "@type": "SearchAction",
+                            "target": "https://trp.srmtrichy.edu.in/?s={search_term_string}",
+                            "query-input": "required name=search_term_string"
+                        }
+                    },
+                    {
+                        "@type": "WebPage",
+                        "@id": f"{full_url}#webpage",
+                        "url": full_url,
+                        "name": self.meta_title or f"{self.name} - Course",
+                        "datePublished": published_iso,
+                        "dateModified": modified_iso,
+                        "about": {"@id": "https://trp.srmtrichy.edu.in/#organization"},
+                        "isPartOf": {"@id": "https://trp.srmtrichy.edu.in/#website"},
+                        "inLanguage": "en-US"
+                    },
+                    {
+                        "@type": "Person",
+                        "@id": f"https://trp.srmtrichy.edu.in/author/{author_slug}/",
+                        "name": self.author or "SRM TRP Engineering College",
+                        "worksFor": {"@id": "https://trp.srmtrichy.edu.in/#organization"}
+                    },
+                    {
+                        "@type": "Article",
+                        "headline": self.meta_title or f"{self.name} - Course",
+                        "keywords": self.keywords or f"{self.name.lower()}, engineering course, {self.department.name.lower() if self.department else 'engineering'}",
+                        "datePublished": published_iso,
+                        "dateModified": modified_iso,
+                        "author": {
+                            "@id": f"https://trp.srmtrichy.edu.in/author/{author_slug}/",
+                            "name": self.author or "SRM TRP Engineering College"
+                        },
+                        "publisher": {"@id": "https://trp.srmtrichy.edu.in/#organization"},
+                        "description": self.meta_description[:500] if self.meta_description else f"Course at SRM TRP Engineering College",
+                        "name": self.meta_title or f"{self.name} - Course",
+                        "@id": f"{full_url}#richSnippet",
+                        "isPartOf": {"@id": f"{full_url}#webpage"},
+                        "inLanguage": "en-US",
+                        "mainEntityOfPage": {"@id": f"{full_url}#webpage"}
+                    }
+                ]
             }
-            # Provider name is already set to SRM TRP Engineering College
-            self.schema_json = str(schema).replace("'", '"')
+            self.schema_json = json.dumps(schema, indent=2)
 
     class Meta:
         ordering = ['name']
@@ -236,4 +317,21 @@ class CourseBanner(models.Model):
         return f"Banner for {self.course.name}"
 
     class Meta:
-        ordering = ['-created_at'] 
+        ordering = ['-created_at']
+
+
+class POPSOPEO(models.Model):
+    """PO-PSO-PEO model for courses"""
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='po_pso_peo', null=True, blank=True)
+    name = models.CharField(max_length=200, blank=True, null=True, help_text="PO, PSO, or PEO")
+    content = RichTextField(blank=True, null=True, help_text="Content for PO, PSO, or PEO")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.course.name} - {self.name}"
+    
+    class Meta:
+        ordering = ['name']
+        verbose_name = "PO-PSO-PEO"
+        verbose_name_plural = "PO-PSO-PEO" 

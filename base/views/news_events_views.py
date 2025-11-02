@@ -62,20 +62,34 @@ def news_events_to_dto(news_event, include_full_details=False):
     dto = {
         'id': news_event.id,
         'heading': news_event.heading,
-        'date': news_event.date,
+        'slug': news_event.slug,
+        'date': news_event.date.isoformat() if news_event.date else None,
         'link': news_event.link,
         'category': news_event.get_category_display(),
         'category_value': news_event.category,
         'department': {
             'id': news_event.department.id,
-            'name': news_event.department.name
-        },
+            'name': news_event.department.name,
+            'slug': news_event.department.slug
+        } if news_event.department else None,
         'content': news_event.content,
         'is_published': news_event.is_published,
         'is_featured': news_event.is_featured,
         'unique_id': str(news_event.unique_id),
-        'created_at': news_event.created_at,
-        'updated_at': news_event.updated_at,
+        'created_at': news_event.created_at.isoformat() if news_event.created_at else None,
+        'updated_at': news_event.updated_at.isoformat() if news_event.updated_at else None,
+        # SEO fields
+        'meta_title': news_event.meta_title,
+        'meta_description': news_event.meta_description,
+        'canonical_url': news_event.canonical_url,
+        'og_title': news_event.og_title,
+        'og_description': news_event.og_description,
+        'og_image': news_event.og_image,
+        'twitter_title': news_event.twitter_title,
+        'twitter_description': news_event.twitter_description,
+        'twitter_image': news_event.twitter_image,
+        'schema_json': news_event.schema_json,
+        'keywords': news_event.keywords,
     }
     
     if include_full_details:

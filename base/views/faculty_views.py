@@ -46,12 +46,25 @@ def faculty_to_dto(faculty, include_full_details=False):
         'department': {
             'id': faculty.department.id,
             'name': faculty.department.name,
+            'slug': faculty.department.slug,
         } if faculty.department else None,
         'mail_id': faculty.mail_id,
         'phone_number': faculty.phone_number,
         'link': faculty.link,
-        'created_at': faculty.created_at,
-        'updated_at': faculty.updated_at,
+        'created_at': faculty.created_at.isoformat() if faculty.created_at else None,
+        'updated_at': faculty.updated_at.isoformat() if faculty.updated_at else None,
+        # SEO fields
+        'meta_title': faculty.meta_title,
+        'meta_description': faculty.meta_description,
+        'canonical_url': faculty.canonical_url,
+        'og_title': faculty.og_title,
+        'og_description': faculty.og_description,
+        'og_image': faculty.og_image,
+        'twitter_title': faculty.twitter_title,
+        'twitter_description': faculty.twitter_description,
+        'twitter_image': faculty.twitter_image,
+        'schema_json': faculty.schema_json,
+        'keywords': faculty.keywords,
     }
     
     if include_full_details:
@@ -185,10 +198,17 @@ def get_all_faculty(request):
     """Get all faculty members with optional filtering"""
     faculty_queryset = Faculty.objects.select_related('designation', 'department')
     
-    # Filter by department if provided
-    department_id = request.GET.get('department_id')
-    if department_id:
-        faculty_queryset = faculty_queryset.filter(department_id=department_id)
+    # Filter by department if provided (supports both ID and slug)
+    department_param = request.GET.get('department_id')
+    if department_param:
+        try:
+            try:
+                department = Department.objects.get(slug=department_param)
+            except Department.DoesNotExist:
+                department = Department.objects.get(id=int(department_param))
+            faculty_queryset = faculty_queryset.filter(department=department)
+        except (ValueError, Department.DoesNotExist):
+            pass  # Invalid department parameter, return all
     
     # Filter by designation if provided
     designation_id = request.GET.get('designation_id')
@@ -341,17 +361,42 @@ def search_faculty_by_name(request, search_term):
 )
 @api_view(['GET'])
 def get_faculty_by_department(request, department_id):
-    """Get all faculty members of a specific department"""
-    department = get_object_or_404(Department, id=department_id)
+    """Get all faculty members of a specific department (by ID or slug)"""
+    try:
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
+    
     faculty_queryset = department.faculty_members.select_related('designation').all()
+    
+    # Identify HOD (Head of Department) - typically has "Head" or "HOD" in designation
+    hod = None
+    hod_designation_keywords = ['head', 'hod', 'chair', 'director', 'principal']
+    regular_faculty = []
+    
+    for faculty in faculty_queryset:
+        if faculty.designation:
+            designation_lower = faculty.designation.name.lower()
+            if any(keyword in designation_lower for keyword in hod_designation_keywords):
+                if not hod:  # Take first HOD found
+                    hod = faculty_to_dto(faculty, include_full_details=True)
+                else:
+                    regular_faculty.append(faculty_to_dto(faculty))
+            else:
+                regular_faculty.append(faculty_to_dto(faculty))
+        else:
+            regular_faculty.append(faculty_to_dto(faculty))
     
     response_data = {
         'department': {
             'id': department.id,
             'name': department.name,
+            'slug': department.slug,
         },
         'faculty_count': faculty_queryset.count(),
-        'faculty_members': [faculty_to_dto(faculty) for faculty in faculty_queryset]
+        'hod': hod,  # Head of Department (if exists)
+        'faculty_members': regular_faculty  # All other faculty
     }
     
     return Response(response_data, status=status.HTTP_200_OK)

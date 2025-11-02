@@ -7,28 +7,49 @@ from drf_yasg import openapi
 from base.models.course_model import (
     Course, AboutTheCourseModel, NumberDataATD, QuickLinksModel,
     SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
-    CTAModel, CourseBanner
+    CTAModel, CourseBanner, POPSOPEO
 )
 from base.models.department_model import Department
 
 
 def course_to_dto(course):
-    """Convert Course model to DTO (dictionary)"""
-    return {
-        'id': course.id,
-        'name': course.name,
-        'slug': course.slug,
-        'department': {
-            'id': course.department.id,
-            'name': course.department.name
-        } if course.department else None,
-        'ug': course.ug,
-        'pg': course.pg,
-        'phd': course.phd,
-        'about_the_course': course.about_the_course,
-        'created_at': course.created_at,
-        'updated_at': course.updated_at,
-    }
+    """Convert Course model to DTO (dictionary) with safe null handling"""
+    try:
+        return {
+            'id': course.id,
+            'name': course.name or '',
+            'slug': course.slug or None,
+            'department': {
+                'id': course.department.id,
+                'name': course.department.name or '',
+                'slug': course.department.slug or None
+            } if course.department else None,
+            'ug': bool(course.ug) if course.ug is not None else False,
+            'pg': bool(course.pg) if course.pg is not None else False,
+            'phd': bool(course.phd) if course.phd is not None else False,
+            'about_the_course': course.about_the_course or None,
+            'lab_overview': course.lab_overview or None,
+            'misc': course.misc or None,
+            'created_at': course.created_at.isoformat() if course.created_at else None,
+            'updated_at': course.updated_at.isoformat() if course.updated_at else None,
+        }
+    except Exception as e:
+        # Fallback DTO if there's any error
+        return {
+            'id': course.id,
+            'name': str(course.name) if hasattr(course, 'name') else '',
+            'slug': str(course.slug) if hasattr(course, 'slug') and course.slug else None,
+            'department': None,
+            'ug': False,
+            'pg': False,
+            'phd': False,
+            'about_the_course': None,
+            'lab_overview': None,
+            'misc': None,
+            'created_at': None,
+            'updated_at': None,
+            'error': f'Serialization warning: {str(e)}'
+        }
 
 
 def number_data_to_dto(number_data):
@@ -276,6 +297,13 @@ def get_course_by_name(request, course_name):
             status=status.HTTP_404_NOT_FOUND
         )
     
+    # Get PO-PSO-PEO
+    po_pso_peo = POPSOPEO.objects.filter(course=course)
+    po_pso_peo_data = [
+        {'name': item.name, 'content': item.content}
+        for item in po_pso_peo
+    ]
+    
     # Return the same comprehensive data structure as get_course_detail
     course_dto = {
         'course': course_to_dto(course),
@@ -288,6 +316,7 @@ def get_course_by_name(request, course_name):
         'contacts': [contact_to_dto(contact) for contact in course.contacts.all()],
         'cta_sections': [cta_to_dto(cta) for cta in course.cta_sections.all()],
         'banners': [banner_to_dto(banner) for banner in course.banners.all()],
+        'po_pso_peo': po_pso_peo_data,
     }
     
     return Response(course_dto, status=status.HTTP_200_OK)
@@ -308,11 +337,12 @@ def get_course_by_name(request, course_name):
 )
 @api_view(['GET'])
 def get_courses_by_department(request, department_id):
-    """Get all courses for a specific department"""
+    """Get all courses for a specific department (by ID or slug)"""
     try:
-        department = Department.objects.get(id=department_id)
-    except Department.DoesNotExist:
-        return Response({"error": "Department not found"}, status=status.HTTP_404_NOT_FOUND)
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
 
     courses = Course.objects.filter(department=department)
     course_dtos = [course_to_dto(course) for course in courses]
@@ -320,7 +350,8 @@ def get_courses_by_department(request, department_id):
     return Response({
         'department': {
             'id': department.id,
-            'name': department.name
+            'name': department.name,
+            'slug': department.slug
         },
         'courses': course_dtos,
         'total_courses': len(course_dtos)
@@ -632,6 +663,13 @@ def get_course_detail(request, course_id):
     """Get complete course details by ID with all related data"""
     course = get_object_or_404(Course, id=course_id)
     
+    # Get PO-PSO-PEO
+    po_pso_peo = POPSOPEO.objects.filter(course=course)
+    po_pso_peo_data = [
+        {'name': item.name, 'content': item.content}
+        for item in po_pso_peo
+    ]
+    
     # Return the same comprehensive data structure as get_course_by_name
     course_dto = {
         'course': course_to_dto(course),
@@ -644,6 +682,7 @@ def get_course_detail(request, course_id):
         'contacts': [contact_to_dto(contact) for contact in course.contacts.all()],
         'cta_sections': [cta_to_dto(cta) for cta in course.cta_sections.all()],
         'banners': [banner_to_dto(banner) for banner in course.banners.all()],
+        'po_pso_peo': po_pso_peo_data,
     }
     
     return Response(course_dto, status=status.HTTP_200_OK)
@@ -664,11 +703,12 @@ def get_course_detail(request, course_id):
 )
 @api_view(['GET'])
 def get_courses_by_department(request, department_id):
-    """Get all courses for a specific department"""
+    """Get all courses for a specific department (by ID or slug)"""
     try:
-        department = Department.objects.get(id=department_id)
-    except Department.DoesNotExist:
-        return Response({"error": "Department not found"}, status=status.HTTP_404_NOT_FOUND)
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
 
     courses = Course.objects.filter(department=department)
     course_dtos = [course_to_dto(course) for course in courses]
@@ -676,7 +716,8 @@ def get_courses_by_department(request, department_id):
     return Response({
         'department': {
             'id': department.id,
-            'name': department.name
+            'name': department.name,
+            'slug': department.slug
         },
         'courses': course_dtos,
         'total_courses': len(course_dtos)

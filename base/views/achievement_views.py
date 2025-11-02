@@ -12,7 +12,7 @@ from base.models.course_model import Course
 
 def achievement_to_dto(achievement, achievement_type="college"):
     """Convert Achievement model to DTO"""
-    return {
+    dto = {
         'id': achievement.id,
         'image': achievement.image.url if achievement.image else None,
         'alt': achievement.alt,
@@ -32,6 +32,12 @@ def achievement_to_dto(achievement, achievement_type="college"):
         'created_at': achievement.created_at,
         'updated_at': achievement.updated_at,
     }
+    
+    # Add achievement_name for StudentAchievement
+    if achievement_type == "student" and hasattr(achievement, 'achievement_name'):
+        dto['achievement_name'] = achievement.achievement_name
+    
+    return dto
 
 
 # ============================================================================
@@ -243,8 +249,9 @@ def delete_college_achievement(request, achievement_id):
     operation_id="create_student_achievement",
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
-        required=['image', 'alt', 'department_id', 'date'],
+        required=['department_id', 'date'],
         properties={
+            'achievement_name': openapi.Schema(type=openapi.TYPE_STRING, description="Name of the achievement"),
             'image': openapi.Schema(type=openapi.TYPE_FILE),
             'alt': openapi.Schema(type=openapi.TYPE_STRING),
             'department_id': openapi.Schema(type=openapi.TYPE_INTEGER),
@@ -263,11 +270,9 @@ def delete_college_achievement(request, achievement_id):
 def create_student_achievement(request):
     """Create a new student achievement"""
     # Validate required fields
-    if not all([request.data.get('department_id'), request.data.get('date'),
-                request.FILES.get('image'),
-                request.data.get('alt')]):
+    if not all([request.data.get('department_id'), request.data.get('date')]):
         return Response(
-            {"error": "Missing required fields"}, 
+            {"error": "Missing required fields: department_id and date are required"}, 
             status=status.HTTP_400_BAD_REQUEST
         )
     
@@ -278,8 +283,9 @@ def create_student_achievement(request):
         course = get_object_or_404(Course, id=request.data['course_id'])
     
     achievement = StudentAchievement.objects.create(
-        image=request.FILES['image'],
-        alt=request.data['alt'],
+        achievement_name=request.data.get('achievement_name'),
+        image=request.FILES.get('image'),
+        alt=request.data.get('alt'),
         department=department,
         course=course,
         date=request.data['date'],
@@ -341,6 +347,7 @@ def get_all_student_achievements(request):
     search_term = request.GET.get('search')
     if search_term:
         queryset = queryset.filter(
+            Q(achievement_name__icontains=search_term) |
             Q(description__icontains=search_term) |
             Q(department__name__icontains=search_term) |
             Q(course__name__icontains=search_term)
@@ -376,6 +383,7 @@ def get_student_achievement(request, achievement_id):
     request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
         properties={
+            'achievement_name': openapi.Schema(type=openapi.TYPE_STRING, description="Name of the achievement"),
             'image': openapi.Schema(type=openapi.TYPE_FILE),
             'alt': openapi.Schema(type=openapi.TYPE_STRING),
             'department_id': openapi.Schema(type=openapi.TYPE_INTEGER),
@@ -396,6 +404,8 @@ def update_student_achievement(request, achievement_id):
     achievement = get_object_or_404(StudentAchievement, id=achievement_id)
     
     # Update fields if provided
+    if 'achievement_name' in request.data:
+        achievement.achievement_name = request.data['achievement_name']
     if 'image' in request.FILES:
         achievement.image = request.FILES['image']
     if 'alt' in request.data:

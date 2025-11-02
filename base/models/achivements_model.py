@@ -26,8 +26,9 @@ class CollegeAchievement(models.Model):
 
 
 class StudentAchievement(models.Model):
-    image = models.ImageField(upload_to='achievements/student/')
-    alt = models.CharField(max_length=255, help_text="Alt text for image")
+    achievement_name = models.CharField(max_length=255, blank=True, null=True, help_text="Name of the achievement")
+    image = models.ImageField(upload_to='achievements/student/', blank=True, null=True, help_text="Optional image for the achievement")
+    alt = models.CharField(max_length=255, help_text="Alt text for image", blank=True, null=True)
     unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, related_name='student_achievements')
     course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True, blank=True, related_name='student_achievements')

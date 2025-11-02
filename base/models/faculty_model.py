@@ -4,6 +4,7 @@ from django.utils.text import slugify
 from ckeditor.fields import RichTextField
 from base.models.department_model import Department, SEOMixin
 import uuid
+import re
 
 
 class Designation(models.Model):
@@ -45,8 +46,19 @@ class Faculty(SEOMixin):
         designation_name = self.designation.name if self.designation else ""
         return f"{self.name or ''} - {designation_name}"
 
+    def clean_text(self, text):
+        """Remove HTML tags and clean text for SEO fields"""
+        if not text:
+            return ""
+        # Remove HTML tags
+        text = re.sub(r'<[^>]+>', '', str(text))
+        # Remove extra whitespace
+        text = re.sub(r'\s+', ' ', text)
+        # Strip leading/trailing whitespace
+        return text.strip()
+
     def generate_seo_data(self):
-        """Generate SEO data for faculty"""
+        """Generate SEO data for faculty - all fields auto-generated without HTML"""
         # Auto-generate slug from name if not provided
         if not self.slug and self.name:
             base_slug = slugify(self.name)
@@ -65,23 +77,35 @@ class Faculty(SEOMixin):
             else:
                 self.slug = base_slug
         
+        # Clean name and designation for use in titles (remove any HTML)
+        clean_name = self.clean_text(self.name) if self.name else "Faculty"
+        desig = self.clean_text(self.designation.name) if self.designation else "Faculty"
+        dept = self.department.name if self.department else ""
+        
+        # Auto-generate meta_title (no HTML)
         if not self.meta_title:
-            desig = self.designation.name if self.designation else "Faculty"
-            dept = self.department.name if self.department else ""
             connector = f" at {dept}" if dept else ""
-            self.meta_title = f"{self.name or 'Faculty'} - {desig}{connector}"
+            self.meta_title = f"{clean_name} - {desig}{connector} | SRM TRP Engineering College"
+        else:
+            self.meta_title = self.clean_text(self.meta_title)
 
+        # Auto-generate meta_description (no HTML, strip tags)
         if not self.meta_description:
             description_parts = []
             if self.bio:
-                description_parts.append(str(self.bio)[:150])
+                bio_text = self.clean_text(self.bio)
+                description_parts.append(bio_text[:150])
             if self.qualification:
-                description_parts.append(str(self.qualification)[:150])
-            desig = self.designation.name if self.designation else "Faculty"
-            dept = self.department.name if self.department else ""
-            tail = f", {desig}{' at ' + dept if dept else ''}" if (self.name or desig or dept) else ""
-            self.meta_description = " | ".join(description_parts) if description_parts else f"Learn about {self.name or desig}{tail}"
+                qual_text = self.clean_text(self.qualification)
+                description_parts.append(qual_text[:150])
+            
+            tail = f", {desig}{' at ' + dept if dept else ''}" if (clean_name or desig or dept) else ""
+            self.meta_description = " | ".join(description_parts) if description_parts else f"Learn about {clean_name}{tail}"
+        else:
+            # Clean existing meta_description if it has HTML
+            self.meta_description = self.clean_text(self.meta_description)[:160]
 
+        # Auto-generate canonical_url (flexible - supports relative paths)
         if not self.canonical_url:
             if self.slug:
                 self.canonical_url = f"/faculty/{self.slug}/"
@@ -89,60 +113,95 @@ class Faculty(SEOMixin):
                 self.canonical_url = f"/faculty/{self.id}/"
             else:
                 self.canonical_url = "/faculty/"
+        # Ensure canonical_url starts with / (for relative paths)
+        elif self.canonical_url and not self.canonical_url.startswith('http') and not self.canonical_url.startswith('/'):
+            self.canonical_url = f"/{self.canonical_url}"
 
+        # Auto-generate og_title (no HTML)
         if not self.og_title:
-            desig = self.designation.name if self.designation else "Faculty"
-            self.og_title = f"{(self.name or '').strip()} - {desig}".strip(" -")
+            self.og_title = f"{clean_name} - {desig}".strip(" -")
+        else:
+            self.og_title = self.clean_text(self.og_title)
 
+        # Auto-generate og_description (no HTML)
         if not self.og_description:
-            self.og_description = self.meta_description[:200] if self.meta_description else f"Learn about {self.name}"
+            clean_desc = self.clean_text(self.meta_description) if self.meta_description else f"Learn about {clean_name}"
+            self.og_description = clean_desc[:200]
+        else:
+            self.og_description = self.clean_text(self.og_description)[:200]
 
         if not self.og_image and self.image:
             self.og_image = self.image.url
 
+        # Auto-generate twitter_title (no HTML)
         if not self.twitter_title:
-            self.twitter_title = self.og_title[:70] if self.og_title else f"{self.name or 'Faculty'}"
+            clean_title = self.clean_text(self.og_title) if self.og_title else clean_name
+            self.twitter_title = clean_title[:70]
+        else:
+            self.twitter_title = self.clean_text(self.twitter_title)[:70]
 
+        # Auto-generate twitter_description (no HTML)
         if not self.twitter_description:
-            self.twitter_description = self.og_description[:200] if self.og_description else f"Learn about {self.name or 'Faculty'}"
+            clean_desc = self.clean_text(self.og_description) if self.og_description else f"Learn about {clean_name}"
+            self.twitter_description = clean_desc[:200]
+        else:
+            self.twitter_description = self.clean_text(self.twitter_description)[:200]
 
         if not self.twitter_image:
             self.twitter_image = self.og_image
 
+        # Auto-generate keywords (no HTML)
         if not self.keywords:
             keywords = []
-            if self.name:
-                keywords.append(self.name.lower())
-            if self.designation and self.designation.name:
-                keywords.append(self.designation.name.lower())
-            if self.department and self.department.name:
-                keywords.append(self.department.name.lower())
+            if clean_name:
+                keywords.extend(clean_name.lower().split()[:3])  # First 3 words from name
+            if desig:
+                keywords.append(desig.lower())
+            if dept:
+                keywords.append(dept.lower())
             if self.qualification:
-                keywords.extend([word.strip() for word in str(self.qualification).split() if len(word) > 3])
-            self.keywords = ", ".join(keywords)
+                qual_clean = self.clean_text(self.qualification)
+                keywords.extend([word.strip() for word in qual_clean.split() if len(word) > 3][:5])
+            self.keywords = ", ".join(keywords[:10]) if keywords else ""
+        else:
+            # Clean existing keywords if needed
+            self.keywords = self.clean_text(self.keywords)
 
         if not self.author:
             self.author = "SRM TRP Engineering College"
 
-        # Generate basic schema.org JSON-LD for Person
+        # Auto-generate schema.org JSON-LD for Person (no HTML in fields)
         if not self.schema_json:
+            clean_schema_desc = self.clean_text(self.meta_description)[:500] if self.meta_description else f"Faculty member at SRM TRP Engineering College"
+            
+            # Build full URL for canonical
+            if self.canonical_url.startswith('http'):
+                full_url = self.canonical_url
+            else:
+                full_url = f"https://trp.srmtrichy.edu.in{self.canonical_url}"
+            
             schema = {
                 "@context": "https://schema.org",
                 "@type": "Person",
-                "name": self.name or "",
-                "jobTitle": self.designation.name if self.designation else "",
+                "name": clean_name,
+                "jobTitle": desig,
                 "worksFor": {
                     "@type": "EducationalOrganization",
                     "name": "SRM TRP Engineering College"
                 },
-                "description": self.meta_description[:500] if self.meta_description else "Faculty member at SRM TRP Engineering College",
-                "url": self.link if self.link else (f"https://trp.srmtrichy.edu.in{self.canonical_url}" if self.canonical_url else (f"https://trp.srmtrichy.edu.in/faculty/{self.slug or self.id}/" if self.id else ""))
+                "description": clean_schema_desc,
+                "url": self.link if self.link else full_url
             }
+            
             if self.mail_id:
                 schema["email"] = self.mail_id
             if self.phone_number:
                 schema["telephone"] = self.phone_number
-            self.schema_json = str(schema).replace("'", '"')
+            if self.image:
+                schema["image"] = self.image.url
+            
+            import json
+            self.schema_json = json.dumps(schema)
 
     class Meta:
         ordering = ['name']

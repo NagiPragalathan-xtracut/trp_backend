@@ -1243,6 +1243,141 @@ NEXT_PUBLIC_API_URL=https://trp-backend.vercel.app/api/v1
 
 ---
 
+## 12. ACHIEVEMENTS INTEGRATION
+
+### Complete Guide
+For comprehensive Achievements integration guide covering:
+- Student Achievements API
+- College Achievements API
+- Department page integration
+- Homepage integration
+- Component examples
+- TypeScript interfaces
+
+**See:** [`achievements_integration_guide.md`](./achievements_integration_guide.md)
+
+### Quick Reference
+
+**Endpoints:**
+- `GET /api/v1/achievements/student/` - Get all student achievements
+- `GET /api/v1/achievements/student/?department_id=<id>` - Filter by department
+- `GET /api/v1/achievements/college/` - Get all college achievements
+- `GET /api/v1/achievements/college/?department_id=<id>` - Filter by department
+
+**Use Cases:**
+- Department pages: Display department-specific achievements
+- Homepage: Show recent/featured achievements
+- All achievements page: Full listing with filters
+
+---
+
+## 13. CAREER SUCCESS INTEGRATION
+
+### Complete Guide
+For comprehensive Career Success integration guide covering:
+- Career Success Stories API
+- Department page integration
+- Dedicated career success page
+- Filtering by department, batch, and search
+- Company information integration
+- Component examples
+- TypeScript interfaces
+
+**See:** [`career_success_integration_guide.md`](./career_success_integration_guide.md)
+
+### Quick Reference
+
+**Endpoints:**
+- `GET /api/v1/career/successes/` - Get all career success stories
+- `GET /api/v1/career/successes/?department_id=<id>` - Filter by department
+- `GET /api/v1/career/successes/?batch=<batch>` - Filter by batch
+- `GET /api/v1/career/successes/?search=<term>` - Search stories
+
+**Use Cases:**
+- Department pages: Display department-specific success stories
+- Career page: Full listing with filters
+- Homepage: Featured success stories
+
+---
+
+## 14. NEWS & EVENTS INTEGRATION
+
+### Complete Guide
+For comprehensive News & Events integration guide covering:
+- News & Events API with filtering
+- SEO metadata handling (auto-generated, HTML-free)
+- Listing page with filters
+- Detail page with slug-based routing
+- Department-specific news/events
+- Category filtering (news, events, announcement, student_activity, research)
+- Tag support
+- Rich text content rendering
+
+**See:** [`news_events_integration_guide.md`](./news_events_integration_guide.md)
+
+### Quick Reference
+
+**Endpoints:**
+- `GET /api/v1/news-events/` - Get all news/events
+- `GET /api/v1/news-events/?category=<category>` - Filter by category
+- `GET /api/v1/news-events/?department_id=<id>` - Filter by department
+- `GET /api/v1/news-events/?is_featured=true` - Get featured items
+- `GET /api/v1/news-events/?search=<term>` - Search
+- `GET /api/v1/news-events/<id>/` - Get single news/event
+
+**SEO Features:**
+- ✅ All SEO fields auto-generated (no HTML)
+- ✅ Canonical URL supports relative paths
+- ✅ Slug auto-generated from heading
+- ✅ Schema.org JSON-LD included
+
+**Use Cases:**
+- News listing page with filters
+- Event detail pages
+- Department news/events sections
+- Homepage featured news/events
+
+---
+
+## 15. FACULTY INTEGRATION
+
+### Complete Guide
+For comprehensive Faculty integration guide covering:
+- Faculty API with department filtering
+- HOD (Head of Department) identification
+- Department page integration (HOD showcase + faculty slider)
+- Faculty detail pages with slug-based routing
+- SEO metadata handling (auto-generated, HTML-free)
+- Component examples (HODCard, FacultySlider, FacultyDetail)
+
+**See:** [`faculty_integration_guide.md`](./faculty_integration_guide.md)
+
+### Quick Reference
+
+**Endpoints:**
+- `GET /api/v1/faculty/` - Get all faculty
+- `GET /api/v1/faculty/?department_id=<slug_or_id>` - Filter by department
+- `GET /api/v1/faculty/department/<slug_or_id>/` - Get department faculty with HOD
+- `GET /api/v1/faculty/<slug_or_id>/` - Get single faculty (by ID or slug)
+
+**HOD Identification:**
+- Automatically identified by designation keywords (head, hod, chair, director, principal)
+- HOD returned separately from other faculty
+- Perfect for showcasing HOD prominently on department pages
+
+**SEO Features:**
+- ✅ All SEO fields auto-generated (no HTML)
+- ✅ Canonical URL supports relative paths
+- ✅ Slug auto-generated from name
+- ✅ Schema.org Person JSON-LD included
+
+**Use Cases:**
+- Department pages: HOD prominently displayed + all faculty in slider
+- Faculty listing page: All faculty with filters
+- Faculty detail pages: Full profile with all information
+
+---
+
 ## Summary Checklist
 
 ✅ **Department Integration:**

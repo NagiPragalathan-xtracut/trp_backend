@@ -5,12 +5,12 @@ from django.utils.html import format_html
 from base.models.department_model import (
     Department, AboutDepartment, NumberData, QuickLink,
     ProgramOffered, Curriculum,
-    CTA, POPSOPEO, Facility, Banner, DepartmentStatistics
+    CTA, Facility, Banner, DepartmentStatistics
 )
 from base.models.course_model import (
     Course, AboutTheCourseModel, NumberDataATD, QuickLinksModel,
     SubjectsModel, LabModel, CurriculumModel, BenefitsModel,
-    CTAModel, CourseBanner
+    CTAModel, CourseBanner, POPSOPEO
 )
 from base.models.faculty_model import (
     Faculty, Designation, FacultyBanner
@@ -280,9 +280,11 @@ class DepartmentAdmin(admin.ModelAdmin):
             'fields': (('programs_image', 'programs_image_alt'), 'facilities_overview')
         }),
         ('SEO & Meta Data', {
-            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
-                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
-                      'keywords', 'author', 'published_date', 'is_published', 'featured'),
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'robots',
+                      'og_title', 'og_description', 'og_image', 'og_type', 'og_locale', 'og_site_name', 'og_url',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 
+                      'twitter_label1', 'twitter_data1', 'twitter_label2', 'twitter_data2',
+                      'schema_json', 'keywords', 'author', 'published_date', 'is_published', 'featured'),
             'classes': ('collapse',)
         }),
         ('Timestamps', {
@@ -298,7 +300,6 @@ class DepartmentAdmin(admin.ModelAdmin):
         QuickLinkInline,
         DepartmentStatisticsInline,
         ProgramOfferedInline,
-        POPSOPEOInline,
         FacilityInline,
         CurriculumInline,
         CTAInline,
@@ -423,10 +424,15 @@ class CourseAdmin(admin.ModelAdmin):
         ('Basic Information', {
             'fields': ('name', 'slug', 'department', ('ug', 'pg', 'phd'))
         }),
+        ('Misc.', {
+            'fields': ('about_the_course', 'lab_overview', 'misc')
+        }),
         ('SEO & Meta Data', {
-            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
-                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
-                      'keywords', 'author', 'published_date', 'is_published', 'featured'),
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'robots',
+                      'og_title', 'og_description', 'og_image', 'og_type', 'og_locale', 'og_site_name', 'og_url',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 
+                      'twitter_label1', 'twitter_data1', 'twitter_label2', 'twitter_data2',
+                      'schema_json', 'keywords', 'author', 'published_date', 'is_published', 'featured'),
             'classes': ('collapse',)
         }),
         ('Timestamps', {
@@ -443,6 +449,7 @@ class CourseAdmin(admin.ModelAdmin):
         SubjectsInline,
         LabInline,
         CurriculumCourseInline,
+        POPSOPEOInline,
         CTACourseInline,
     ]
     
@@ -556,9 +563,11 @@ class FacultyAdmin(admin.ModelAdmin):
             'classes': ('collapse',)
         }),
         ('SEO & Meta Data', {
-            'fields': ('meta_title', 'meta_description', 'canonical_url', 'og_title', 'og_description', 'og_image', 'og_type',
-                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 'schema_json',
-                      'keywords', 'author', 'published_date', 'is_published', 'featured'),
+            'fields': ('meta_title', 'meta_description', 'canonical_url', 'robots',
+                      'og_title', 'og_description', 'og_image', 'og_type', 'og_locale', 'og_site_name', 'og_url',
+                      'twitter_title', 'twitter_description', 'twitter_image', 'twitter_card', 
+                      'twitter_label1', 'twitter_data1', 'twitter_label2', 'twitter_data2',
+                      'schema_json', 'keywords', 'author', 'published_date', 'is_published', 'featured'),
             'classes': ('collapse',)
         }),
         ('Timestamps', {
@@ -670,15 +679,15 @@ class CollegeAchievementAdmin(admin.ModelAdmin):
 
 @admin.register(StudentAchievement)
 class StudentAchievementAdmin(admin.ModelAdmin):
-    list_display = ['department', 'course', 'date', 'image_preview', 'unique_id', 'created_at']
+    list_display = ['achievement_name', 'department', 'course', 'date', 'image_preview', 'unique_id', 'created_at']
     list_filter = ['department', 'course', 'date', 'created_at']
-    search_fields = ['description', 'department__name', 'course__name']
+    search_fields = ['achievement_name', 'description', 'department__name', 'course__name']
     readonly_fields = ['unique_id', 'created_at', 'updated_at', 'image_preview']
     ordering = ['-date', '-created_at']
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('department', 'course', 'date')
+            'fields': ('achievement_name', 'department', 'course', 'date')
         }),
         ('Media', {
             'fields': ('image', 'image_preview', 'alt')

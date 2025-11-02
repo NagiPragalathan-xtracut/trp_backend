@@ -7,7 +7,7 @@ from ..serializers import DepartmentStatisticsSerializer
 from base.models.department_model import (
     Department, AboutDepartment, NumberData, QuickLink,
     ProgramOffered, Curriculum, DepartmentContact,
-    CTA, POPSOPEO, Facility, Banner, DepartmentStatistics
+    CTA, Facility, Banner, DepartmentStatistics
 )
 
 @swagger_auto_schema(
@@ -42,7 +42,6 @@ from base.models.department_model import (
                     "benefits": [],
                     "contacts": [],
                     "ctas": [],
-                    "po_pso_peo": [],
                     "facilities": [],
                     "banners": []
                 }
@@ -53,8 +52,14 @@ from base.models.department_model import (
 )
 @api_view(['GET'])
 def get_department_detail(request, department_id):
-    """Get all details for a specific department"""
-    department = get_object_or_404(Department, id=department_id)
+    """Get all details for a specific department (by ID)"""
+    try:
+        # Try to parse as integer first
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        # If not an integer, treat as slug
+        department = get_object_or_404(Department, slug=department_id)
     
     # Get related data
     about_sections = AboutDepartment.objects.filter(department=department)
@@ -139,13 +144,6 @@ def get_department_detail(request, department_id):
         for cta in ctas
     ]
     
-    # Get PO-PSO-PEO
-    po_pso_peo = POPSOPEO.objects.filter(department=department)
-    po_pso_peo_data = [
-        {'name': item.name, 'content': item.content}
-        for item in po_pso_peo
-    ]
-    
     # Get facilities
     facilities = Facility.objects.filter(department=department)
     facilities_data = [
@@ -205,7 +203,6 @@ def get_department_detail(request, department_id):
             'benefits': benefits_data,
             'contacts': contacts_data,
             'ctas': ctas_data,
-            'po_pso_peo': po_pso_peo_data,
             'facilities': facilities_data,
             'banners': banners_data,
             'statistics': statistics_data
@@ -298,21 +295,24 @@ def get_all_departments(request):
 )
 @api_view(['GET'])
 def get_department_programs(request, department_id):
-    """Get all programs for a specific department"""
-    department = get_object_or_404(Department, id=department_id)
+    """Get all programs for a specific department (by ID or slug)"""
+    try:
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
     programs = department.get_ordered_programs()
 
     programs_data = [
         {
             'id': prog.id,
-            'name': prog.name,
             'course': {
                 'id': prog.course.id if prog.course else None,
-                'name': prog.course.name if prog.course else None
+                'name': prog.course.name if prog.course else None,
+                'slug': prog.course.slug if prog.course else None
             } if prog.course else None,
             'display_order': prog.display_order,
             'description': prog.description,
-            'image': department.programs_image.url if department.programs_image else None,
             'explore_link': prog.explore_link,
             'apply_link': prog.apply_link
         }
@@ -357,18 +357,21 @@ def get_department_programs(request, department_id):
 )
 @api_view(['GET'])
 def get_department_facilities(request, department_id):
-    """Get all facilities for a specific department"""
-    department = get_object_or_404(Department, id=department_id)
+    """Get all facilities for a specific department (by ID or slug)"""
+    try:
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
     facilities = Facility.objects.filter(department=department)
     
     facilities_data = [
         {
+            'id': fac.id,
             'heading': fac.heading,
             'description': fac.description,
             'image': fac.image.url if fac.image else None,
-            'alt': fac.alt,
-            'link_blank': fac.link_blank,
-            'content': fac.content
+            'alt': fac.alt
         }
         for fac in facilities
     ]
@@ -400,11 +403,12 @@ def get_department_facilities(request, department_id):
 )
 @api_view(['GET'])
 def get_department_statistics(request, department_id):
-    """Get all statistics for a specific department"""
+    """Get all statistics for a specific department (by ID or slug)"""
     try:
-        department = Department.objects.get(id=department_id)
-    except Department.DoesNotExist:
-        return Response({"error": "Department not found"}, status=404)
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
 
     statistics = DepartmentStatistics.objects.filter(department=department)
     statistics_data = [
@@ -464,11 +468,12 @@ def get_department_statistics(request, department_id):
 )
 @api_view(['POST'])
 def create_department_statistic(request, department_id):
-    """Create a new statistic for a department"""
+    """Create a new statistic for a department (by ID or slug)"""
     try:
-        department = Department.objects.get(id=department_id)
-    except Department.DoesNotExist:
-        return Response({"error": "Department not found"}, status=404)
+        dept_id = int(department_id)
+        department = get_object_or_404(Department, id=dept_id)
+    except ValueError:
+        department = get_object_or_404(Department, slug=department_id)
 
     data = request.data.copy()
     data['department'] = department.id
