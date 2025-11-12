@@ -219,7 +219,13 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://127.0.0.1:3001",
     "http://127.0.0.1:8000",
+    "https://trp.srmtrichy.edu.in",  # Production frontend
+    "https://www.trp.srmtrichy.edu.in",  # Production frontend with www
 ]
+
+# Allow all origins in development (for flexibility)
+# In production, use CORS_ALLOWED_ORIGINS above
+CORS_ALLOW_ALL_ORIGINS = os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() == 'true'
 
 # Allow credentials in CORS requests
 CORS_ALLOW_CREDENTIALS = True
